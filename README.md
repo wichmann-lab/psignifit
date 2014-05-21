@@ -1,9 +1,9 @@
 psignifit
 =========
 
-Toolbox for Bayesian inference for psychometric functions
-    
-    Copyright (C) 2014 Heiko Schuett
+Toolbox for Bayesian psychometric function estimation
+
+    Copyright (C) 2014 Heiko Schütt
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
