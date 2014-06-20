@@ -99,7 +99,7 @@ plotPsych(res);
 % large. If you run into Memory issues you can drop the Posterior from the
 % result with the following command.
 
-result = rmfield(result_1,{'Posterior','weight'});
+result = rmfield(res,{'Posterior','weight'});
 
 % without these fields you will not be able to use the 2D Bayesian plots
 % anymore and the equalityTest will fail. All other functions work without
