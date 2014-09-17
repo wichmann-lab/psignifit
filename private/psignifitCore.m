@@ -66,11 +66,14 @@ switch options.estimateType
   % get MLE estimate
   % For now with builtin MATLAB functions
   
+  % start at most likely gridpoint
   [~, idx]    = max(result.Posterior(:));
   index       = cell(d,1);
   [index{:}]  = ind2sub(size(result.Posterior), idx);
   Fit         = zeros(d,1);
   for id = 1:d, Fit(id) = result.X1D{id}(index{id}); end
+  
+  % set special options, if fastOptim was chosen.
   
   switch options.expType
    case 'YesNo'
@@ -84,8 +87,12 @@ switch options.estimateType
     x0  = Fit([(1:3)'; 5]);
    otherwise, error('unknown expType'); 
   end
+  if options.fastOptim 
+      optimiseOptions = optimset('MaxFunEvals',100,'MaxIter',100,'TolX',0,'TolFun',0);
+      warning('changed options for optimization')
+  end
   switch 1
-   case 1, Fit = fminsearch(fun, x0);
+   case 1, Fit = fminsearch(fun, x0,optimiseOptions);
    case 2, error('buggy, do not use, define derivative'); Fit = minimize(x0, fun, 100);
    case 3, error('not done yet');      Fit = fminunc();  
    otherwise, error('unknown optimizer');
@@ -113,6 +120,8 @@ result.data    = data;
 
 
 %% compute confidence intervals
-result.conf_Intervals = getConfRegion(result);
+if ~options.fastOptim
+    result.conf_Intervals = getConfRegion(result);
+end
 
 

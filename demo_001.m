@@ -1,5 +1,5 @@
 %% DEMO_001 basic useage
-% The Psifnifit 101
+% The Psignifit 101
 
 %% save data in right format
 

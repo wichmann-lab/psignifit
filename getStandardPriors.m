@@ -13,21 +13,32 @@ if options.logspace
     data(:,1) = log(data(:,1));
 end
 
+%% if range was not given take from data
+if numel(options.stimulusRange)<=1
+    options.stimulusRange = [min(data(:,1)),max(data(:,1))];
+    stimRangeSet = true;
+else 
+    stimRangeSet = false;
+end
 
 %% threshold
-xspread   = max(data(:,1))-min(data(:,1));
+xspread = options.stimulusRange(2)-options.stimulusRange(1);
 % we assume the threshold is in the range of the data, for larger or
 % smaller values we tapre down to 0 with a raised cosine across half the
 % dataspread
-priors{1} = @(x) (x>=(min(data(:,1))-.5*xspread)).*(x<=min(data(:,1))).*(.5+.5*cos(2*pi.*(min(data(:,1))-x)./xspread))...
-    + (x>min(data(:,1))).*(x<max(data(:,1)))...
-    + (x>=max(data(:,1))).*(x<=max(data(:,1))+.5*xspread).*(.5+.5*cos(2*pi.*(x-max(data(:,1)))./xspread));
+priors{1} = @(x) (x>=(options.stimulusRange(1)-.5*xspread)).*(x<=options.stimulusRange(1)).*(.5+.5*cos(2*pi.*(options.stimulusRange(1)-x)./xspread))...
+    + (x>options.stimulusRange(1)).*(x<options.stimulusRange(2))...
+    + (x>=options.stimulusRange(2)).*(x<=options.stimulusRange(2)+.5*xspread).*(.5+.5*cos(2*pi.*(x-options.stimulusRange(2))./xspread));
 
 
 %% width
 % minimum = minimal difference of two stimulus levels
-widthmin  = min(diff(sort(unique(data(:,1)))));
-% maximum = spread of the data 
+if length(unique(data(:,1)))>1 && ~stimRangeSet
+    widthmin  = min(diff(sort(unique(data(:,1)))));
+else
+    widthmin = 100*eps(options.stimulusRange(2));
+end
+% maximum = spread of the data
 widthmax  = xspread;
 % add a cosine devline over 2 times the spread of the data
 priors{2} = @(x) (x>=widthmin).*(x<=2*widthmin).*(.5-.5*cos(pi.*(x-widthmin)./widthmin))...

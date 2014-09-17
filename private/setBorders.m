@@ -31,15 +31,30 @@ varscaleB = [0, 1 - exp(-20)];
 if options.logspace
     data(:, 1) = log(data(:, 1));
 end
+
+% if range was not given take from data
+if numel(options.stimulusRange)<=1
+    options.stimulusRange = [min(data(:,1)),max(data(:,1))];
+    stimRangeSet = true;
+else 
+    stimRangeSet = false;
+end
+
 % We then assume it is one of the reparameterized functions with
 % alpha=threshold and beta= width
 % The threshold is assumed to be within the range of the data +/-
 % .5 times it's spread
-dataspread = max(data(:, 1)) - min(data(:, 1));                                      % spread of the data
-alphaB     = [min(data(:, 1)) - .5 * dataspread, max(data(:, 1)) + .5 * dataspread]; % threshold borders
+dataspread = options.stimulusRange(2)-options.stimulusRange(1);                     % spread of the data
+alphaB     = [options.stimulusRange(1) - .5 * dataspread, options.stimulusRange(2) + .5 * dataspread]; % threshold borders
 % the width we assume to be between half the minimal distance of
 % two points and 5 times the spread of the data
-betaB      = [min(diff(sort(unique(data(:, 1))))) , 3 * dataspread];                     % width borders
+
+if length(unique(data(:,1)))>1 && ~stimRangeSet
+    widthmin  = min(diff(sort(unique(data(:,1)))));
+else
+    widthmin = 100*eps(options.stimulusRange(2));
+end
+betaB      = [widthmin , 3 * dataspread];                     % width borders
 
 
 Borders = [alphaB; betaB; lapseB; gammaB; varscaleB];

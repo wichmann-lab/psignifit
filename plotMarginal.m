@@ -1,4 +1,4 @@
-function plotMarginal(result,dim,plotOptions)
+function h=plotMarginal(result,dim,plotOptions)
 % plots the marginal for a single dimension
 %function plotMarginal(result,dim,plotOptions)
 %  result       should be a result struct from the main psignifit routine
@@ -15,6 +15,7 @@ if ~isfield(plotOptions,'labelSize'),      plotOptions.labelSize      = 14;     
 if ~isfield(plotOptions,'tufteAxis'),      plotOptions.tufteAxis      = true;               end
 if ~isfield(plotOptions,'prior'),          plotOptions.prior          = true;               end
 if ~isfield(plotOptions,'priorColor'),     plotOptions.priorColor     = [.7,.7,.7];         end
+if ~isfield(plotOptions,'CIpatch'),        plotOptions.CIpatch        = true;               end
 
 
 if ~exist('dim','var'),                    dim                        = 1;                  end
@@ -34,6 +35,14 @@ if isempty(plotOptions.xLabel)
     end
 end
 
+if exist('h','var') && ~isempty(h)
+    axes(h);
+else
+    h=gca;
+    axes(h);
+end
+
+
 x        = result.marginalsX{dim};
 marginal = result.marginals{dim};
 CI       = result.conf_Intervals(dim,:);
@@ -41,12 +50,15 @@ Fit      = result.Fit(dim);
 
 
 % patch for confidence region
-xCI      = [CI(1);x(x>=CI(1) & x<=CI(2));CI(2);CI(2);CI(1)];
+if plotOptions.CIpatch
+    xCI      = [CI(1);x(x>=CI(1) & x<=CI(2));CI(2);CI(2);CI(1)];
+    
+    yCI      = [interp1(x,marginal,CI(1));          ...
+        marginal(x>=CI(1) & x<=CI(2));   ...
+        interp1(x,marginal,CI(2));0;0];
+    patch(xCI,yCI,.5*plotOptions.lineColor+.5*[1,1,1],'EdgeColor',.5*plotOptions.lineColor+.5*[1,1,1]);
+end
 
-yCI      = [interp1(x,marginal,CI(1));          ...  
-                marginal(x>=CI(1) & x<=CI(2));   ...
-                interp1(x,marginal,CI(2));0;0];
-patch(xCI,yCI,.5*plotOptions.lineColor+.5*[1,1,1],'EdgeColor',.5*plotOptions.lineColor+.5*[1,1,1]);
 hold on
 
 % plot prior
@@ -72,9 +84,9 @@ if plotOptions.tufteAxis
     tufteaxis(unique([min(x),CI(1),Fit,CI(2),max(x)]),[0,max(marginal)]);
 end
 
-h = xlabel(plotOptions.xLabel,'FontSize',plotOptions.labelSize);
-set(h,'Visible','on')
-set(h,'Position',get(h,'Position') - [0 .05 0])
-h = ylabel('marginal density','FontSize',plotOptions.labelSize);
-set(h,'Visible','on')
-set(h,'Position',get(h,'Position') - [.05 0 0])
+hlabel = xlabel(plotOptions.xLabel,'FontSize',plotOptions.labelSize);
+set(hlabel,'Visible','on')
+set(hlabel,'Position',get(hlabel,'Position') - [0 .05 0])
+hlabel = ylabel('marginal density','FontSize',plotOptions.labelSize);
+set(hlabel,'Visible','on')
+set(hlabel,'Position',get(hlabel,'Position') - [.05 0 0])

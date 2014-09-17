@@ -44,7 +44,17 @@ mmy = sort(mmy);
 
 % (1) modify the current ticks
 if length(mmx) > 2
-  XTick = mmx;                                                   % take the ticks from mmx
+  XTick = get(gca, 'XTick');                                      % start with the current
+  %XTick = mmx;                                                  % take the ticks from mmx
+  offx  = (mmx(end)-mmx(1))./10;
+  for i = 1:length(mmx)
+    % remove to crowded ticks 
+    XTick(XTick >= mmx(i) - offx & XTick <= mmx(i) + offx) = [];    
+  end
+  XTick(XTick<mmx(1))   = [];
+  XTick(XTick>mmx(end)) = [];
+  XTick = [XTick,mmx];
+  XTick = sort(XTick);
   mmx   = [mmx(1), mmx(end)];
 else
   XTick = get(gca, 'XTick');                                      % start with the current
@@ -58,7 +68,17 @@ else
   XTick = [mmx(1), XTick, mmx(2)];                                       % add min and max
 end
 if length(mmy) > 2
-  YTick = mmy;
+  XTick = get(gca, 'YTick');                                      % start with the current
+  %YTick = mmy;
+  offy  = (mmy(end)-mmy(1))./10;  
+  for i = 1:length(mmy)
+    % remove to crowded ticks 
+    YTick(YTick >= mmy(i) - offy & YTick <= mmy(i) + offy) = [];    
+  end
+  YTick(YTick<mmx(1))   = [];
+  YTick(YTick>mmx(end)) = [];
+  YTick = [YTick,mmy];
+  YTick = sort(YTick);
   mmy   = [mmy(1), mmy(end)];
 else
   YTick = get(gca, 'YTick');
@@ -96,13 +116,29 @@ XLim = get(gca, 'XLim');                                       % get the coordin
 YLim = get(gca, 'YLim');                                       % get the coordinate system
 XLim = [min(mmx(1), XLim(1)), max(mmx(2), XLim(2))];        % increase limits if necessary
 YLim = [min(mmy(1), YLim(1)), max(mmy(2), YLim(2))];        % increase limits if necessary
-XLim(1) = min(XLim(1), mmx(1) - 0.1*(mmx(2)-mmx(1)));        % to avoid points on the axis
-YLim(1) = min(YLim(1), mmy(1) - 0.1*(mmy(2)-mmy(1)));        % to avoid points on the axis
+if strcmp(get(gca,'XScale'), 'linear')
+    XLim(1) = min(XLim(1), mmx(1) - 0.1*(mmx(2)-mmx(1)));        % to avoid points on the axis
+else %logspace
+    XLim(1) = min(XLim(1), exp(log(mmx(1)) - 0.1*(log(mmx(2))-log(mmx(1)))));
+end
+if strcmp(get(gca,'YScale'), 'linear')
+    YLim(1) = min(YLim(1), mmy(1) - 0.1*(mmy(2)-mmy(1)));        % to avoid points on the axis
+else
+    YLim(1) = min(YLim(1), exp(log(mmy(1)) - 0.1*(log(mmy(2))-log(mmy(1)))));
+end
 set(gca, 'XLim', XLim);
 set(gca, 'YLim', YLim);
 [left, bottom, width, height] = calcLimits();
-tx   = @(x) left   + width  * (x - XLim(1)) / diff(XLim);     % convert to global position
-ty   = @(y) bottom + height * (y - YLim(1)) / diff(YLim);     % convert to global position
+if strcmp(get(gca,'XScale'), 'linear')
+    tx   = @(x) left   + width  * (x - XLim(1)) / diff(XLim);     % convert to global position
+else % logscale
+    tx   = @(x) left   + width  * (log(x) - log(XLim(1))) / diff(log(XLim));     % convert to global position
+end
+if strcmp(get(gca,'YScale'), 'linear')
+    ty   = @(y) bottom + height * (y - YLim(1)) / diff(YLim);     % convert to global position
+else % logscale
+    ty   = @(y) bottom + height * (log(y) - log(YLim(1))) / diff(log(YLim));     % convert to global position    
+end
 
 % (5) draw new axis
 ax   = annotation('line', tx(mmx), bottom*[1,1]);                      % x coordinate axis
@@ -122,7 +158,8 @@ for i = 1:nXTick
                       'string', num2str(XTick(i),'%.3g'), ...
                       'VerticalAlignment', 'top', ...
                       'HorizontalAlignment', 'center', ...
-                      'EdgeColor', 'none');
+                      'EdgeColor', 'none',...
+                      'FontSize',get(gca,'FontSize'));
 end
 nYTick = length(YTick);
 tty    = zeros(nYTick, 1);                                                % to store ticks
@@ -133,7 +170,8 @@ for i = 1:length(YTick)
                       'string', num2str(YTick(i),'%.3g'), ...
                       'VerticalAlignment', 'middle', ...
                       'HorizontalAlignment', 'right', ...
-                      'EdgeColor', 'none');
+                      'EdgeColor', 'none',...
+                      'FontSize',get(gca,'FontSize'));
 end
 for h = [ax; ttx(:); tlx(:); ay; tty(:); tly(:)]'
   set(h, 'Tag', tag);   % mark the annotations to find them on our next
@@ -210,8 +248,16 @@ setappdata(gca, 'DataAspectRatioListener', hListener);
     XLim = get(gca, 'XLim');                                   % get the coordinate system
     YLim = get(gca, 'YLim');                                   % get the coordinate system
     [left, bottom, width, height] = calcLimits();
-    tx   = @(x) left + width * (x - XLim(1)) / diff(XLim);    % convert to global position
-    ty   = @(y) bottom + height * (y - YLim(1)) / diff(YLim); % convert to global position
+    if strcmp(get(gca,'XScale'), 'linear')
+        tx   = @(x) left   + width  * (x - XLim(1)) / diff(XLim);     % convert to global position
+    else % logscale
+        tx   = @(x) left   + width  * (log(x) - log(XLim(1))) / diff(log(XLim));     % convert to global position
+    end
+    if strcmp(get(gca,'YScale'), 'linear')
+        ty   = @(y) bottom + height * (y - YLim(1)) / diff(YLim);     % convert to global position
+    else % logscale
+        ty   = @(y) bottom + height * (log(y) - log(YLim(1))) / diff(log(YLim));     % convert to global position
+    end
     set(ax, 'X', max(min(tx(mmx), left+width), left));
     set(ax, 'Y', bottom*[1,1]);
     for i = 1:nXTick

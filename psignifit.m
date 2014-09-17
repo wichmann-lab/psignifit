@@ -41,15 +41,15 @@ if ~isfield(options,'widthalpha'),           options.widthalpha     = .05;      
 if ~isfield(options,'CImethod'),             options.CImethod       = 'stripes';end
 if ~isfield(options,'gridSetType'),          options.gridSetType    = 'cumDist';end
 if ~isfield(options,'fixedPars'),            options.fixedPars      = nan(5,1); end
-if ~isfield(options,'nblocks'),              options.nblocks        = 30;       end
+if ~isfield(options,'nblocks'),              options.nblocks        = inf;      end
 if ~isfield(options,'useGPU'),               options.useGPU         = 0;        end
-if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = 1;        end
-if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = 20;       end
+if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = inf;      end
+if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = 50;       end
 if ~isfield(options,'poolxTol'),             options.poolxTol       = 0;        end
 if ~isfield(options,'betaPrior'),            options.betaPrior      = 20;       end
 if ~isfield(options,'verbose'),              options.verbose        = 0;        end
-
-
+if ~isfield(options,'stimulusRange'),        options.stimulusRange  = 0;        end
+if ~isfield(options,'fastOptim'),            options.fastOptim      = false;    end
 
 
 
@@ -104,6 +104,10 @@ if ~isfield(options,'priors')
 else 
     if iscell(options.priors)
         priors = getStandardPriors(data,options);
+        % if provided priors are to short
+        if length(options.priors)<5 
+            options.priors = [options.priors,cell(1,5-length(options.priors))];
+        end
         for ipar = 1:5
             if isa(options.priors{ipar},'function_handle')
                 % use the provided prior
@@ -114,6 +118,8 @@ else
     else
         error('if you provide your own priors it should be a cell array of function handles')
     end
+    %check priors 
+    checkPriors(data,options);
 end
 
 % for dynamic grid setting
@@ -127,7 +133,7 @@ if options.dynamicGrid && ~isfield(options,'UniformWeight'), options.UniformWeig
 % pool data if necessary
 % -> more than options.nblocks blocks or only 1 trial per block
 if max(data(:, 3)) == 1 || size(data, 1) > options.nblocks
-    warning('We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n You can force acceptence of your blocks by increasing options.nblocks');
+    warning('psignifit:pooling','We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n You can force acceptence of your blocks by increasing options.nblocks');
     data = poolData(data,options);
     options.nblocks = size(data, 1);
 else
@@ -143,6 +149,11 @@ if ~isfield('options', 'borders')
     options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
     options.borders(~isnan(options.fixedPars),2) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
 end
+
+% normalize priors to first choice of borders
+
+options.priors = normalizePriors(options);
+
 if options.moveBorders
     options.borders = moveBorders(data,options);
 end

@@ -29,6 +29,8 @@ lambda(  lambda   < 0 | lambda   > 1-max(gamma )) = nan;
 gamma(   gamma    < 0 | gamma    > 1-max(lambda)) = nan;
 varscale(varscale < 0 | varscale > 1)             = nan;
 
+varscaleOrig = reshape(varscale,1,1,1,1,[]);
+
 useGPU = options.useGPU && ...                                 % did the user ask for GPU?
     ~oneParameter;                                                    %do we need the gpu?
 
@@ -71,6 +73,7 @@ else % for grid evaluation! with bsxfuns
     
     v       = varscale(~vbinom);
     v       = 1./v-1;
+    v       = reshape(v       ,1,1,1,1,[]);
     p       = 0;                                                                % posterior
     pbin    = 0;                                        % posterior for binomial model part
     n       = size(data,1);
@@ -114,7 +117,13 @@ else % for grid evaluation! with bsxfuns
     end
     if options.verbose > 3, fprintf('\n'); end
     p = cat(5,repmat(pbin,[1,1,1,1,sum(vbinom)]),p);
-    if useGPU, p = gather(p); end
+    if useGPU 
+        p      = gather(p); 
+        lambda = gather(lambda);
+        gamma  = gather(gamma);
+        alpha  = gather(alpha);
+        beta   = gather(beta);
+    end
     % now with the other priors
     %p = bsxfun(@plus,p,(be-1).*log(1-varscale)-betaln(1,be));
     
@@ -136,7 +145,7 @@ if ~isempty(options.priors)
             p = bsxfun(@plus,p,log(options.priors{4}(gamma)));
         end
         if isa(options.priors{5},'function_handle')
-            p = bsxfun(@plus,p,log(options.priors{5}(varscale)));
+            p = bsxfun(@plus,p,log(options.priors{5}(varscaleOrig)));
         end
     end
 end
