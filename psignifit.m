@@ -73,7 +73,7 @@ switch options.expType
         error('You specified an illegal experiment type')
 end
 
-assert(max(data(:,1)) > min(data(:,1)) , 'Your data does not have variance on the x-axis! This makes fitting impossible')
+assert(max(data(:,1)) > min(data(:,1)) || numel(options.stimulusRange)==2 , 'Your data does not have variance on the x-axis! This makes fitting impossible')
 
 % check gpuOptions
 if options.useGPU && ~gpuDeviceCount
