@@ -90,6 +90,8 @@ switch options.estimateType
   if options.fastOptim 
       optimiseOptions = optimset('MaxFunEvals',100,'MaxIter',100,'TolX',0,'TolFun',0);
       warning('changed options for optimization')
+  else
+      optimiseOptions = optimset();
   end
   switch 1
    case 1, Fit = fminsearch(fun, x0,optimiseOptions);
