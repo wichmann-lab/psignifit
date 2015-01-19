@@ -41,12 +41,12 @@ if ~isfield(options,'widthalpha'),           options.widthalpha     = .05;      
 if ~isfield(options,'CImethod'),             options.CImethod       = 'stripes';end
 if ~isfield(options,'gridSetType'),          options.gridSetType    = 'cumDist';end
 if ~isfield(options,'fixedPars'),            options.fixedPars      = nan(5,1); end
-if ~isfield(options,'nblocks'),              options.nblocks        = inf;      end
+if ~isfield(options,'nblocks'),              options.nblocks        = 25;       end
 if ~isfield(options,'useGPU'),               options.useGPU         = 0;        end
 if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = inf;      end
 if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = 50;       end
 if ~isfield(options,'poolxTol'),             options.poolxTol       = 0;        end
-if ~isfield(options,'betaPrior'),            options.betaPrior      = 20;       end
+if ~isfield(options,'betaPrior'),            options.betaPrior      = 10;       end
 if ~isfield(options,'verbose'),              options.verbose        = 0;        end
 if ~isfield(options,'stimulusRange'),        options.stimulusRange  = 0;        end
 if ~isfield(options,'fastOptim'),            options.fastOptim      = false;    end
@@ -73,7 +73,7 @@ switch options.expType
         error('You specified an illegal experiment type')
 end
 
-assert(max(data(:,1)) > min(data(:,1)) || numel(options.stimulusRange)==2 , 'Your data does not have variance on the x-axis! This makes fitting impossible')
+assert(max(data(:,1)) > min(data(:,1)) , 'Your data does not have variance on the x-axis! This makes fitting impossible')
 
 % check gpuOptions
 if options.useGPU && ~gpuDeviceCount
@@ -144,7 +144,12 @@ end
 options.sigmoidHandle = getSigmoidHandle(options);
 
 % borders of integration
-if ~isfield('options', 'borders')
+if isfield(options, 'borders')
+    borders = setBorders(data,options);
+    options.borders(isnan(options.borders)) = borders(isnan(options.borders));
+    options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
+    options.borders(~isnan(options.fixedPars),2) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
+else
     options.borders = setBorders(data,options);
     options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
     options.borders(~isnan(options.fixedPars),2) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values

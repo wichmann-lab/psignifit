@@ -18,16 +18,16 @@ if ~isfield(plotOptions,'dataColor'),      plotOptions.dataColor      = [0,105/2
 if ~isfield(plotOptions,'plotData'),       plotOptions.plotData       = 1;                  end
 if ~isfield(plotOptions,'lineColor'),      plotOptions.lineColor      = [0,0,0];            end
 if ~isfield(plotOptions,'lineWidth'),      plotOptions.lineWidth      = 2;                  end
-if ~isfield(plotOptions,'xLabel'),         plotOptions.xLabel         = 'stimulus level';   end
-if ~isfield(plotOptions,'yLabel'),         plotOptions.yLabel         = 'percent correct';  end
-if ~isfield(plotOptions,'labelSize'),      plotOptions.labelSize      = 14;                 end
+if ~isfield(plotOptions,'xLabel'),         plotOptions.xLabel         = 'Stimulus Level';   end
+if ~isfield(plotOptions,'yLabel'),         plotOptions.yLabel         = 'Percent Correct';  end
+if ~isfield(plotOptions,'labelSize'),      plotOptions.labelSize      = 15;                 end
 if ~isfield(plotOptions,'fontSize'),       plotOptions.fontSize       = 10;                 end
 if ~isfield(plotOptions,'fontName'),       plotOptions.fontName       = 'Helvetica';        end
-if ~isfield(plotOptions,'tufteAxis'),      plotOptions.tufteAxis      = true;               end
+if ~isfield(plotOptions,'tufteAxis'),      plotOptions.tufteAxis      = false;              end
 if ~isfield(plotOptions,'plotPar'),        plotOptions.plotPar        = true;               end
 if ~isfield(plotOptions,'aspectRatio'),    plotOptions.aspectRatio    = false;              end
 if ~isfield(plotOptions,'extrapolLength'), plotOptions.extrapolLength = .2;                 end
-
+if ~isfield(plotOptions,'CIthresh'),       plotOptions.CIthresh       = false;              end
 
 if isnan(result.Fit(4)),                   result.Fit(4)=result.Fit(3);    end
 
@@ -95,6 +95,12 @@ if plotOptions.plotPar
     plot([min(x),max(x)],[result.Fit(4),result.Fit(4)],':k');
 end
 
+if plotOptions.CIthresh
+    plot(result.conf_Intervals(1,:),repmat(result.Fit(4)+.5*(1-result.Fit(3)-result.Fit(4)),1,2),'Color',plotOptions.lineColor)
+    plot(repmat(result.conf_Intervals(1,1),1,2),repmat(result.Fit(4)+.5*(1-result.Fit(3)-result.Fit(4)),1,2)+[-.01,+.01],'Color',plotOptions.lineColor)
+    plot(repmat(result.conf_Intervals(1,2),1,2),repmat(result.Fit(4)+.5*(1-result.Fit(3)-result.Fit(4)),1,2)+[-.01,+.01],'Color',plotOptions.lineColor)
+end
+
 %% axis settings
 axis tight
 set(gca,'FontSize',plotOptions.fontSize)
@@ -113,5 +119,7 @@ if plotOptions.tufteAxis
     set(get(gca,'yLabel'),'visible','on')
 else 
     ylim([ymin,1]);
+    set(gca,'TickDir','out')
+    box off
 end
 

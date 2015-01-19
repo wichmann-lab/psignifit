@@ -1,4 +1,4 @@
-function h=plotMarginal(result,dim,plotOptions)
+function h=plotMarginal(result,dim,h,plotOptions)
 % plots the marginal for a single dimension
 %function plotMarginal(result,dim,plotOptions)
 %  result       should be a result struct from the main psignifit routine
@@ -7,12 +7,24 @@ function h=plotMarginal(result,dim,plotOptions)
 %  plotOPtions  a struct with additional options for the plot
 % This always plots into gca
 
+
+
+assert(length(result.marginals{dim})>1,'The parameter you wanted to plot was fixed in the analysis!');
+
+if exist('h','var') && ~isempty(h)
+    axes(h);
+else
+    axes(gca);
+    h=gca;
+end
+
 if ~exist('plotOptions','var'),            plotOptions                = struct;             end
 if ~isfield(plotOptions,'lineColor'),      plotOptions.lineColor      = [0,105/255,170/255];end
 if ~isfield(plotOptions,'lineWidth'),      plotOptions.lineWidth      = 2;                  end
 if ~isfield(plotOptions,'xLabel'),         plotOptions.xLabel         = [];                 end
-if ~isfield(plotOptions,'labelSize'),      plotOptions.labelSize      = 14;                 end
-if ~isfield(plotOptions,'tufteAxis'),      plotOptions.tufteAxis      = true;               end
+if ~isfield(plotOptions,'yLabel'),         plotOptions.yLabel         = 'Marginal Density'; end
+if ~isfield(plotOptions,'labelSize'),      plotOptions.labelSize      = 15;                 end
+if ~isfield(plotOptions,'tufteAxis'),      plotOptions.tufteAxis      = false;              end
 if ~isfield(plotOptions,'prior'),          plotOptions.prior          = true;               end
 if ~isfield(plotOptions,'priorColor'),     plotOptions.priorColor     = [.7,.7,.7];         end
 if ~isfield(plotOptions,'CIpatch'),        plotOptions.CIpatch        = true;               end
@@ -20,12 +32,12 @@ if ~isfield(plotOptions,'CIpatch'),        plotOptions.CIpatch        = true;   
 
 if ~exist('dim','var'),                    dim                        = 1;                  end
 
-if isempty(plotOptions.xLabel)    
+if isempty(plotOptions.xLabel)
     switch dim
         case 1
-            plotOptions.xLabel='threshold';
+            plotOptions.xLabel='Threshold';
         case 2
-            plotOptions.xLabel='width';
+            plotOptions.xLabel='Width';
         case 3
             plotOptions.xLabel='\lambda';
         case 4
@@ -63,14 +75,9 @@ hold on
 
 % plot prior
 if plotOptions.prior
-    %normalize prior
-    n = 1000;
-    xprior = linspace(result.options.borders(dim,1),result.options.borders(dim,2),n);
-    y = result.options.priors{dim}(xprior).*(result.options.borders(dim,2)-result.options.borders(dim,1));
-    factor = 1./(n-1)*(0.5 * (y(1)+y(end)) + sum(y(2:(end-1))));
     % plot prior
     xprior = linspace(min(x),max(x),1000);
-    plot(xprior,result.options.priors{dim}(xprior)./factor,'--','Color',plotOptions.priorColor);
+    plot(xprior,result.options.priors{dim}(xprior),'--','Color',plotOptions.priorColor);
 end
 
 %posterior
@@ -86,7 +93,14 @@ end
 
 hlabel = xlabel(plotOptions.xLabel,'FontSize',plotOptions.labelSize);
 set(hlabel,'Visible','on')
-set(hlabel,'Position',get(hlabel,'Position') - [0 .05 0])
-hlabel = ylabel('marginal density','FontSize',plotOptions.labelSize);
+if plotOptions.tufteAxis
+    set(hlabel,'Position',get(hlabel,'Position') - [0 .05 0]);
+end
+hlabel = ylabel(plotOptions.yLabel,'FontSize',plotOptions.labelSize);
 set(hlabel,'Visible','on')
-set(hlabel,'Position',get(hlabel,'Position') - [.05 0 0])
+if plotOptions.tufteAxis
+    set(hlabel,'Position',get(hlabel,'Position') - [.05 0 0])
+else
+    set(gca,'TickDir','out')
+    box off
+end

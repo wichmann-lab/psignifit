@@ -1,5 +1,5 @@
 function Cor = getCor(result)
-% calculates the correlation matrix
+% calculates the correlation matrix accross parameters
 %function Cor = getCor(result)
 % it uses getCov to get the covariance matrix 
 % result should be a result struct which contains the full posterior

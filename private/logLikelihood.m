@@ -1,6 +1,6 @@
 function p = logLikelihood(data,options,alpha,beta,lambda,gamma,varscale)
 % the core function to evaluate the logLikelihood of the data
-%function p=logLikelihood(typeHandle,data,alpha,beta,lambda,gamma)
+%function p=logLikelihood(data,options,alpha,beta,lambda,gamma,varscale)
 % Calculates the logLikelihood of the given data with given parameter
 % values. It is fully vectorized and contains the core calculations of
 % psignifit.
@@ -69,7 +69,7 @@ else % for grid evaluation! with bsxfuns
     varscale= reshape(varscale,1,1,1,1,[]);
     varscale= varscale.^2;                         % go from standard deviation to variance
     vbinom  = varscale < 10^-9;                 % for variances smaller than this we assume
-                                     % the binomial model, otherwise numerical errors occur
+    % the binomial model, otherwise numerical errors occur
     
     v       = varscale(~vbinom);
     v       = 1./v-1;
@@ -102,23 +102,49 @@ else % for grid evaluation! with bsxfuns
         if useGPU, psi = gpuArray(psi); end
         ni    = data(i, 3);                                             % number of trials at xi
         ki    = data(i, 2);                                          % number of successes at xi
-        pbin  = pbin + ki * log(psi) + (ni-ki) * log(1-psi);                    % binomial model
-        if ~isempty(v)                                                  % catch if only binomial       
-            a     = bsxfun(@times,psi,v);                               % alpha for betabinomial
-            b     = bsxfun(@times,1-psi,v);                              % beta for betabinomial
-            p     = p + gammaln(ki + a);                                          % Betabinomial
-            p     = p + gammaln(ni - ki + b);
-            p     = bsxfun(@minus, p, gammaln(ni + v));
-            p     = p - gammaln(a) - gammaln(b);
-            p     = bsxfun(@plus,p, gammaln(v));
+        if (ni-ki)>0 && ki>0
+            pbin  = pbin + ki * log(psi) + (ni-ki) * log(1-psi);                    % binomial model
+            if ~isempty(v)                                                  % catch if only binomial
+                a     = bsxfun(@times,psi,v);                               % alpha for betabinomial
+                b     = bsxfun(@times,1-psi,v);                              % beta for betabinomial
+                p     = p + gammaln(ki + a);                                          % Betabinomial
+                p     = p + gammaln(ni - ki + b);
+                p     = bsxfun(@minus, p, gammaln(ni + v));
+                p     = p - gammaln(a) - gammaln(b);
+                p     = bsxfun(@plus,p, gammaln(v));
+            else
+                p     = [];
+            end
+        elseif ki>0 % => ni-ki == 0
+            pbin  = pbin + ki * log(psi);                                           % binomial model
+            if ~isempty(v)                                                  % catch if only binomial
+                a     = bsxfun(@times,psi,v);                               % alpha for betabinomial
+                p     = p + gammaln(ki + a);                                          % Betabinomial
+                p     = bsxfun(@minus, p, gammaln(ni + v));
+                p     = p - gammaln(a);
+                p     = bsxfun(@plus,p, gammaln(v));
+            else
+                p     = [];
+            end
+        elseif (ni-ki)>0 % => ki == 0
+            pbin  = pbin + (ni-ki) * log(1-psi);                                    % binomial model
+            if ~isempty(v)                                                  % catch if only binomial
+                b     = bsxfun(@times,1-psi,v);                              % beta for betabinomial
+                p     = p + gammaln(ni - ki + b);
+                p     = bsxfun(@minus, p, gammaln(ni + v));
+                p     = p  - gammaln(b);
+                p     = bsxfun(@plus,p, gammaln(v));
+            else
+                p     = [];
+            end
         else 
-            p     = [];
+            % do nothing-> no trial done at this stimulus level
         end
     end
     if options.verbose > 3, fprintf('\n'); end
     p = cat(5,repmat(pbin,[1,1,1,1,sum(vbinom)]),p);
-    if useGPU 
-        p      = gather(p); 
+    if useGPU
+        p      = gather(p);
         lambda = gather(lambda);
         gamma  = gather(gamma);
         alpha  = gather(alpha);
@@ -130,7 +156,7 @@ else % for grid evaluation! with bsxfuns
     p(isnan(p)) = -inf;
 end
 
-if ~isempty(options.priors) 
+if ~isempty(options.priors)
     if iscell(options.priors)
         if isa(options.priors{1},'function_handle')
             p = bsxfun(@plus,p,log(options.priors{1}(alpha)));
