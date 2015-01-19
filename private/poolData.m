@@ -29,7 +29,7 @@ while i <= size(data,1)
         j            = i;                   % index running from current position
         GapViolation = false;               % gap larger than allowed detected
         curGap       = 0;                   % current length of a gap
-        while (j<= size(data,1) && cTrialN(j+1)-cTrialN(i) < maxL && ~GapViolation) || j==i  % while there might be additional trials to add to this block
+        while (j<= size(data,1) && cTrialN(j+1)-cTrialN(i) <= maxL && ~GapViolation) || j==i  % while there might be additional trials to add to this block
             if abs(data(j,1)-curLevel)<=xTol && ~counted(j) % if line is added to block
                 counted(j) = 1;                     % line was just counted
                 block      = [block;data(j,:)];     % add to block data
