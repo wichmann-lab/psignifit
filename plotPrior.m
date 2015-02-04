@@ -23,12 +23,17 @@ range = res.options.stimulusRange(2)-res.options.stimulusRange(1);
 
 % get borders for width
 % minimum = minimal difference of two stimulus levels
+
 if length(unique(data(:,1)))>1 && ~stimRangeSet
     widthmin  = min(diff(sort(unique(data(:,1)))));
 else
     widthmin = 100*eps(res.options.stimulusRange(2));
 end
 % maximum = spread of the data
+
+% We use the same prior as we previously used... e.g. we use the factor by
+% which they differ for the cumulative normal function
+Cfactor   = (my_norminv(.95,0,1) - my_norminv(.05,0,1))./( my_norminv(1-res.options.widthalpha,0,1) - my_norminv(res.options.widthalpha,0,1));
 widthmax  = range;
 
 
@@ -113,14 +118,14 @@ end
 %% width
 
 
-xwidth = linspace(widthmin,3.*widthmax,10000);
+xwidth = linspace(widthmin,3./Cfactor.*widthmax,10000);
 ywidth = res.options.priors{2}(xwidth);
 wwidth = conv(diff(xwidth),.5*[1,1]);
 cwidth = cumsum(ywidth.*wwidth);
 subplot(2,3,2)
 plot(xwidth,ywidth,'LineWidth',lineW,'Color',lineC)
 hold on
-xlim([widthmin,3*widthmax])
+xlim([widthmin,3./Cfactor*widthmax])
 title('Width','FontSize',18)
 
 subplot(2,3,5)

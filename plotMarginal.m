@@ -1,4 +1,4 @@
-function h=plotMarginal(result,dim,h,plotOptions)
+function h=plotMarginal(result,dim,plotOptions)
 % plots the marginal for a single dimension
 %function plotMarginal(result,dim,plotOptions)
 %  result       should be a result struct from the main psignifit routine
@@ -11,12 +11,7 @@ function h=plotMarginal(result,dim,h,plotOptions)
 
 assert(length(result.marginals{dim})>1,'The parameter you wanted to plot was fixed in the analysis!');
 
-if exist('h','var') && ~isempty(h)
-    axes(h);
-else
-    axes(gca);
-    h=gca;
-end
+
 
 if ~exist('plotOptions','var'),            plotOptions                = struct;             end
 if ~isfield(plotOptions,'lineColor'),      plotOptions.lineColor      = [0,105/255,170/255];end
@@ -28,6 +23,15 @@ if ~isfield(plotOptions,'tufteAxis'),      plotOptions.tufteAxis      = false;  
 if ~isfield(plotOptions,'prior'),          plotOptions.prior          = true;               end
 if ~isfield(plotOptions,'priorColor'),     plotOptions.priorColor     = [.7,.7,.7];         end
 if ~isfield(plotOptions,'CIpatch'),        plotOptions.CIpatch        = true;               end
+if ~isfield(plotOptions,'plotPE'),         plotOptions.plotPE         = true;               end
+
+if isfield(plotOptions,'h')
+    h = plotOptions.h;
+else 
+    h = gca;
+end
+assert(ishandle(h),'Invalid axes handle provided to plot in.')
+axes(h);
 
 
 if ~exist('dim','var'),                    dim                        = 1;                  end
@@ -83,7 +87,9 @@ end
 %posterior
 plot(x,marginal,'LineWidth',plotOptions.lineWidth,'Color',plotOptions.lineColor);
 % point estimate
-plot([Fit;Fit],[0;interp1(x,marginal,Fit)],'k');
+if plotOptions.plotPE
+    plot([Fit;Fit],[0;interp1(x,marginal,Fit)],'k');
+end
 
 
 

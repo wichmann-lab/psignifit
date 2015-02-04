@@ -13,14 +13,11 @@ function result=psignifit(data,options)
 % The result of this function is a struct, which contains all information
 % the program produced for your fit. You can pass this as whole to all
 % further processing function provided with psignifit. Especially to the
-% plot and test functions.
-% You can find an explanation for all fields of the result in demo003, an
-% introduction to our plotting functions in demo004 and to the test
-% functions in demo005
+% plot functions.
+% You can find an explanation for all fields of the result in demo006
 %
 %
 % To get an introduction to basic useage start with demo001
-%
 
 
 
@@ -44,7 +41,7 @@ if ~isfield(options,'fixedPars'),            options.fixedPars      = nan(5,1); 
 if ~isfield(options,'nblocks'),              options.nblocks        = 25;       end
 if ~isfield(options,'useGPU'),               options.useGPU         = 0;        end
 if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = inf;      end
-if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = 50;       end
+if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = inf;      end
 if ~isfield(options,'poolxTol'),             options.poolxTol       = 0;        end
 if ~isfield(options,'betaPrior'),            options.betaPrior      = 10;       end
 if ~isfield(options,'verbose'),              options.verbose        = 0;        end
