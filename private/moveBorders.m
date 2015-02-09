@@ -3,13 +3,10 @@ function borders = moveBorders(data,options)
 %function borders=moveBorders(data, options)
 % this function evaluates the likelihood on a much sparser, equally spaced
 % grid definded by mbStepN and moves the borders in so that that 
-% marginals below tol*(max(likelihood)) is taken away from the borders.
+% marginals below tol are taken away from the borders.
 %
 % this is meant to save computing power by not evaluating the likelihood in
 % areas where it is practically 0 everywhere.
-%
-% tol should always be smaller than 1/max(range of xi) assuring that
-% there is a marginal value >tol
 
 tol = options.maxBorderValue;
 d   = size(options.borders,1);
@@ -86,16 +83,16 @@ for id = 1:d
     end
 end
 
-MBresult.weight    = getWeights(MBresult.X1D);                                   % get integration weights
-MBresult.Posterior = likelihood(data, options, MBresult.X1D{:});                 % evaluate likelihood
-integral           = sum(MBresult.Posterior(:) .* MBresult.weight(:));           % get total probability
-MBresult.Posterior = MBresult.Posterior ./ integral;                             % normalize
+MBresult.weight    = getWeights(MBresult.X1D);                                    % get integration weights
+MBresult.Posterior = likelihood(data, options, MBresult.X1D{:});                  % evaluate likelihood
+integral           = sum(MBresult.Posterior(:) .* MBresult.weight(:));            % get total probability
+MBresult.Posterior = MBresult.Posterior ./ integral;                              % normalize
 
 borders            = zeros(d,2);
 for id=1:d
     % this is already normed to have integral 1
-    [L1D, x]      = marginalize(MBresult,id);                                    % marginalize
-    x1            = x(max(find(L1D>=tol, 1, 'first') - 1, 1));                   % find first rise above threshold
-    x2            = x(min(find(L1D>=tol, 1, 'last' ) + 1, length(x)));           % find last point above threshold
-    borders(id,:) = [x1,x2];                                                     % format result
+    [L1D, x, w]    = marginalize(MBresult,id);                                    % marginalize
+    x1             = x(max(find(L1D.*w>=tol, 1, 'first') - 1, 1));                % find first rise above threshold
+    x2             = x(min(find(L1D.*w>=tol, 1, 'last' ) + 1, length(x)));        % find last point above threshold
+    borders(id,:)  = [x1,x2];                                                     % format result
 end
