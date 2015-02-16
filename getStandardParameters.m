@@ -25,6 +25,13 @@ function theta = getStandardParameters(theta,type,widthalpha)
 %       theta(2) = width     -> standard deviation
 
 if ~exist('widthalpha','var'), widthalpha=.05; end
+
+if isstruct(theta)
+    widthalpha = theta.options.widthalpha;
+    type  = theta.options.sigmoidName;
+    theta = theta.Fit; 
+end
+
 assert(logical(exist('type','var')),'You need to specify which kind of sigmoid you fit');
 
 switch type
