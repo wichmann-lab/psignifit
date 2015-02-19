@@ -24,6 +24,25 @@ oneParameter = ~(numel(alpha) > 1 ||  ...         % is the input only one point?
     numel(gamma) > 1 ||  ...
     numel(varscale) > 1);
 
+if oneParameter  % in optimization if the parameter supplied is not the fixed value
+                 % Replace it somewhere else because optimizing on this becomes random!   
+    if isfinite(options.fixedPars(1))
+        alpha = options.fixedPars(1);
+    end
+    if isfinite(options.fixedPars(2))
+        beta = options.fixedPars(2);
+    end
+    if isfinite(options.fixedPars(3))
+        lambda = options.fixedPars(3);
+    end
+    if isfinite(options.fixedPars(4))
+        gamma = options.fixedPars(4);
+    end
+    if isfinite(options.fixedPars(5))
+        varscale = options.fixedPars(5);
+    end
+end
+
 % issues for automization: limit range for lambda & gamma
 lambda(  lambda   < 0 | lambda   > 1-max(gamma )) = nan;
 gamma(   gamma    < 0 | gamma    > 1-max(lambda)) = nan;

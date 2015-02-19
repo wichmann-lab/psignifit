@@ -7,6 +7,10 @@ function h=plotMarginal(result,dim,plotOptions)
 %  plotOPtions  a struct with additional options for the plot
 % This always plots into gca
 
+% convert strings to dimension number
+if ischar(dim)
+    dim = strToDim(dim);
+end
 
 
 assert(length(result.marginals{dim})>1,'The parameter you wanted to plot was fixed in the analysis!');
@@ -64,6 +68,11 @@ marginal = result.marginals{dim};
 CI       = result.conf_Intervals(dim,:);
 Fit      = result.Fit(dim);
 
+holdState = ishold(h);
+if ~holdState
+    cla(h);
+end
+hold on
 
 % patch for confidence region
 if plotOptions.CIpatch
@@ -75,7 +84,6 @@ if plotOptions.CIpatch
     patch(xCI,yCI,.5*plotOptions.lineColor+.5*[1,1,1],'EdgeColor',.5*plotOptions.lineColor+.5*[1,1,1]);
 end
 
-hold on
 
 % plot prior
 if plotOptions.prior
@@ -95,6 +103,9 @@ end
 
 if plotOptions.tufteAxis
     tufteaxis(unique([min(x),CI(1),Fit,CI(2),max(x)]),[0,max(marginal)]);
+else
+    xlim([min(x),max(x)]);
+    ylim([0,1.1*max(marginal)]);
 end
 
 hlabel = xlabel(plotOptions.xLabel,'FontSize',plotOptions.labelSize);
@@ -109,4 +120,8 @@ if plotOptions.tufteAxis
 else
     set(gca,'TickDir','out')
     box off
+end
+%% toggle back hold state
+if ~holdState
+    hold off
 end

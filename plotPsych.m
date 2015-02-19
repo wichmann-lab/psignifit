@@ -46,14 +46,19 @@ end
 switch result.options.expType
     case {'nAFC'}
         ymin = 1./result.options.expN;
+        ymin = min(ymin,min(result.data(:,2)./result.data(:,3)));
     otherwise
         ymin = 0;
 end
 
 %% plot data
+holdState = ishold(h);
+if ~holdState
+    cla(h);
+end
 hold on
 if plotOptions.plotData
-    for i=1:length(result.data)
+    for i=1:size(result.data,1)
         plot(result.data(i,1),result.data(i,2)./result.data(i,3),'.','MarkerSize',sqrt(plotOptions.dataSize*result.data(i,3)),'Color',plotOptions.dataColor)
     end
 end
@@ -124,3 +129,7 @@ else
     box off
 end
 
+%% toggle back hold state
+if ~holdState
+    hold off
+end

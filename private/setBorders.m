@@ -54,7 +54,10 @@ if length(unique(data(:,1)))>1 && ~stimRangeSet
 else
     widthmin = 100*eps(options.stimulusRange(2));
 end
-betaB      = [widthmin , 3 * dataspread];                     % width borders
+% We use the same prior as we previously used... e.g. we use the factor by
+% which they differ for the cumulative normal function
+Cfactor   = (my_norminv(.95,0,1) - my_norminv(.05,0,1))./( my_norminv(1-options.widthalpha,0,1) - my_norminv(options.widthalpha,0,1));
+betaB      = [widthmin , 3./Cfactor * dataspread];                     % width borders
 
 
 Borders = [alphaB; betaB; lapseB; gammaB; varscaleB];

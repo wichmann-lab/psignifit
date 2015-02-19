@@ -23,11 +23,18 @@ function result=psignifit(data,options)
 
 
 %% input parsing
+%% data
+if all(data(:,2) <=1 & data(:,2) >= 0) && any(data(:,2) > 0 & data(:,2) < 1) % percent correct data
+    data(:,2) = round(data(:,3).*data(:,2)); % we try to convert it to our notation
+    % Note: No sanity checks here!
+end
 
+
+%% options
 if ~exist('options','var'),                  options=struct;                    end
 if ~isfield(options,'sigmoidName'),          options.sigmoidName    = 'norm';   end
 if ~isfield(options,'expType'),              options.expType        = 'YesNo';  end
-if ~isfield(options,'estimateType'),         options.estimateType   = 'mean';   end
+if ~isfield(options,'estimateType'),         options.estimateType   = 'MAP';    end
 if ~isfield(options,'confP'),                options.confP          = .95;      end
 if ~isfield(options,'instantPlot'),          options.instantPlot    = 0;        end
 if ~isfield(options,'setBordersType'),       options.setBordersType = 0;        end
@@ -38,7 +45,7 @@ if ~isfield(options,'widthalpha'),           options.widthalpha     = .05;      
 if ~isfield(options,'CImethod'),             options.CImethod       = 'stripes';end
 if ~isfield(options,'gridSetType'),          options.gridSetType    = 'cumDist';end
 if ~isfield(options,'fixedPars'),            options.fixedPars      = nan(5,1); end
-if ~isfield(options,'nblocks'),              options.nblocks        = 25;       end
+if ~isfield(options,'nblocks'),              options.nblocks        = 35;       end
 if ~isfield(options,'useGPU'),               options.useGPU         = 0;        end
 if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = inf;      end
 if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = inf;      end
@@ -50,8 +57,21 @@ if ~isfield(options,'fastOptim'),            options.fastOptim      = false;    
 
 
 
-if strcmp(options.expType,'2AFC'),           options.expType        = 'nAFC';
-    options.expN           = 2;        end
+if strcmp(options.expType,'2AFC'),
+    options.expType        = 'nAFC';
+    options.expN           = 2;
+end
+if strcmp(options.expType,'3AFC'),
+    options.expType        = 'nAFC';
+    options.expN           = 3;        
+end
+if strcmp(options.expType,'4AFC'),
+    options.expType        = 'nAFC';
+    options.expN           = 4;        
+end
+
+
+
 
 if strcmp(options.expType,'nAFC') && ~isfield(options,'expN');
     error('For nAFC experiments please also pass the number of alternatives (options.expN)'); end

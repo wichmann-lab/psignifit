@@ -18,6 +18,15 @@ function h = plot2D(result,par1,par2,plotOptions)
 % result, par1 and par2 are compulsory inputs, h and plotOptions may be
 % ommitted or replaced by [] to produce the standard options.
 
+% convert strings to dimension number
+if ischar(par1)
+    par1 = strToDim(par1);
+end
+
+if ischar(par2)
+    par2 = strToDim(par2);
+end
+
 assert(isnumeric(par1) && isnumeric(par2) && par1~=par2, 'par1 and par2 must be different numbers to code for the parameters to plot');
 assert(ismember(par1,1:5) && ismember(par2,1:5), 'par1 and par2 must be natural numbers up to 5 for the five parameters');
 
@@ -71,6 +80,7 @@ else
     axes(gca);
     h=gca;
 end
+
 
 colormap(plotOptions.colorMap);
 set(h,'FontSize',plotOptions.fontSize);

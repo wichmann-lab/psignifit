@@ -93,18 +93,14 @@ switch options.estimateType
   else
       optimiseOptions = optimset();
   end
-  switch 1
-   case 1, Fit = fminsearch(fun, x0,optimiseOptions);
-   case 2, error('buggy, do not use, define derivative'); Fit = minimize(x0, fun, 100);
-   case 3, error('not done yet');      Fit = fminunc();  
-   otherwise, error('unknown optimizer');
-  end
+  Fit = fminsearch(fun, x0,optimiseOptions);
   switch options.expType
    case 'YesNo',           result.Fit = Fit;
    case 'nAFC',            result.Fit = [Fit(1:3); 1/options.expN; Fit(4)];
    case 'equalAsymptote',  result.Fit = Fit([1:3,3,4]);
    otherwise, error('unknown expType'); 
   end
+  result.Fit(~isnan(options.fixedPars)) = options.fixedPars(~isnan(options.fixedPars)); % fix parameters
  case 'mean'
   % get mean estimate
   Fit = zeros(d,1);
