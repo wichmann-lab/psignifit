@@ -55,8 +55,6 @@ useGPU = options.useGPU && ...                                 % did the user as
 
 
 if oneParameter
-    varscale = varscale.^2;
-    v        = 1./varscale -1;
     if strcmp(options.expType,'equalAsymptote')
         gamma = lambda;                                                 % enforce equality
     end
@@ -66,9 +64,11 @@ if oneParameter
     psi   = gamma + scale*psi;                  % average probability of success predicted
     n     = data(:, 3);                                            % number of trials at x
     k     = data(:, 2);                                         % number of successes at x
+    varscale = varscale.^2;
     if varscale < 10^-9
         p  = p + k .* log(psi) + (n-k) .* log(1-psi);                       % binomial model
     else
+        v     = 1./varscale -1;
         a     = psi*v;                                            % alpha for betabinomial
         b     = (1-psi)*v;                                         % beta for betabinomial
         p     = p + gammaln(k + a);                                         % Betabinomial
@@ -79,6 +79,9 @@ if oneParameter
     end
     p = sum(p);% add up loglikelihood
     % + (be-1).*log(1-varscale)-betaln(1,be); % add up loglikelihood and add prior
+    if isnan(p)
+        p = -inf;
+    end
 else % for grid evaluation! with bsxfuns
     %reshaping
     alpha   = reshape(alpha   ,[],1);

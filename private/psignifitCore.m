@@ -91,9 +91,16 @@ switch options.estimateType
       optimiseOptions = optimset('MaxFunEvals',100,'MaxIter',100,'TolX',0,'TolFun',0);
       warning('changed options for optimization')
   else
-      optimiseOptions = optimset();
+      optimiseOptions = optimset('Display','off');
   end
-  Fit = fminsearch(fun, x0,optimiseOptions);
+  lic = license ('inuse');
+  if strcmp(lic(1).feature,'matlab')
+      Fit = fminsearch(fun, x0,optimiseOptions); %MATLAB standard choice 
+  elseif strcmp(lic(1).feature,'octave')
+      Fit = fminunc(fun, x0,optimiseOptions);    % in Octave fminsearch does not work here, god knows why...
+  else
+      Fit = x0;                                  % if you are neither using MATLAB nor Octave, should be somewhat rare...
+  end
   switch options.expType
    case 'YesNo',           result.Fit = Fit;
    case 'nAFC',            result.Fit = [Fit(1:3); 1/options.expN; Fit(4)];
