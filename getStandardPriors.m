@@ -40,20 +40,23 @@ else
 end
 % maximum = spread of the data
 widthmax  = xspread;
+% We use the same prior as we previously used... e.g. we use the factor by
+% which they differ for the cumulative normal function
+Cfactor   = (my_norminv(.95,0,1) - my_norminv(.05,0,1))./( my_norminv(1-options.widthalpha,0,1) - my_norminv(options.widthalpha,0,1));
 % add a cosine devline over 2 times the spread of the data
-priors{2} = @(x) (x>=widthmin).*(x<=2*widthmin).*(.5-.5*cos(pi.*(x-widthmin)./widthmin))...
-    + (x>2*widthmin).*(x<widthmax)...
-    + (x>=widthmax).*(x<=3*widthmax).*(.5+.5*cos(pi./2.*((x-widthmax)./xspread)));
+priors{2} = @(x) ((x.*Cfactor)>=widthmin).*((x.*Cfactor)<=2*widthmin).*(.5-.5*cos(pi.*((x.*Cfactor)-widthmin)./widthmin))...
+    + ((x.*Cfactor)>2*widthmin).*((x.*Cfactor)<widthmax)...
+    + ((x.*Cfactor)>=widthmax).*((x.*Cfactor)<=3*widthmax).*(.5+.5*cos(pi./2.*(((x.*Cfactor)-widthmax)./xspread)));
 
 
 %% asymptotes
-% set asymptote prior to the 1, 20 beta prior, which corresponds to the
-% knowledge obtained from 19 correct trials at infinite stimulus level
-priors{3} = @(x) betapdf(x,1,20);
-priors{4} = @(x) betapdf(x,1,20);
+% set asymptote prior to the 1, 10 beta prior, which corresponds to the
+% knowledge obtained from 9 correct trials at infinite stimulus level
+priors{3} = @(x) my_betapdf(x,1,10);
+priors{4} = @(x) my_betapdf(x,1,10);
 
 %% sigma
 be = options.betaPrior;
-priors{5} = @(x) betapdf(x,1,be);
+priors{5} = @(x) my_betapdf(x,1,be);
 
 end
