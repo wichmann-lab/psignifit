@@ -1,4 +1,4 @@
-% demo_005 fields of the options struct - Which options can one set?
+% demo_002 fields of the options struct - Which options can one set?
 % This demo explains all fields of the options struct, e.g. which options
 % you can set for the fitting process as a user.
 

@@ -8,16 +8,16 @@ function result=psignifit(data,options)
 %       [x-value, number correct, number of trials]
 %
 % options should be a 1x1 struct in which you set the options for your fit.
-% You can find a full overview over the options in demo002
+% You can find a full overview over the options in demo_002
 %
 % The result of this function is a struct, which contains all information
 % the program produced for your fit. You can pass this as whole to all
 % further processing function provided with psignifit. Especially to the
 % plot functions.
-% You can find an explanation for all fields of the result in demo006
+% You can find an explanation for all fields of the result in demo_003
 %
 %
-% To get an introduction to basic useage start with demo001
+% To get an introduction to basic useage start with demo_001
 
 
 

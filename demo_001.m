@@ -4,7 +4,6 @@
 %% save data in right format
 
 % First we need the data in the format (x | nCorrect | total)
-% see demo_XXX to find ways how to obtain this
 % As an example we use the following dataset from a 2AFC experiment with 90
 % trials at each stimulus level. This dataset comes from a simple signal
 % detection experiment.
@@ -26,8 +25,7 @@ data =    [...
 
 % remark: This format differs slightly from the format used in older
 % psignifit versions. You can convert your data by using the reformat
-% comand. If you are a user of the older psignifits, see demo_XXX for an
-% overview over the differences in use.
+% comand. If you are a user of the older psignifits.
 
 %% construct an options struct
 % To start psignifit you need to pass a struct, which specifies, what kind
@@ -71,7 +69,7 @@ options.expType     = '2AFC';   % choose 2-AFC as the paradigm of the experiment
 % 'Weibull'     a Weibull function
 
 % There are many other options you can set in the options-file. You find
-% them in demo_005
+% them in demo_002
 
 
 %% Now run psignifit
@@ -87,10 +85,6 @@ res = psignifit(data,options);
 % function with the data:
 
 plotPsych(res);
-
-% You find different visualizations in demo_XXX and an introduction to
-% the statistical tests on psychometric functions in demo_XXX. All of these
-% are started with the result struct as an argument.
 
 
 
