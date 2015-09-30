@@ -125,13 +125,36 @@ options.stepN=[40,40,50,20,20];
 % for example to get 99% confidence intervals try 
 options.confP          = .99;
 
+% you may specify a vector as well. If you do the conf_intervals in the
+% result will be a 5x2xN array containting the values for the different
+% confidence levels in the 3rd dimension. 
+
+options.confP = [.95,.9,.68,.5];
+% will return 4 confidence intervals for each parameter for example.
+
 %% options.CImethod       ='stripes'
 % this sets how the confidence intervals are computed in getConfRegion.m
 %possible variants are:
 %       'project' -> project the confidence region on each axis
+
 %       'stripes' -> find a threshold with (1-alpha) above it
+
+% this will disregard intervals of low posterior probability and then move
+% in from the sides to adjust the exact CI size.
+% This can handle borders and asymmetric distributions slightly better, but
+% will introduce slight jumps of the confidence interval when confp is
+% adjusted depending on when the gridpoints get too small posterior
+% probability.
+
 %   'percentiles' -> find alpha/2 and 1-alpha/2 percentiles
 %                    (alpha = 1-confP)
+
+% cuts at the estimated percentiles-> always tries to place alpha/2
+% posterior probability above and below the credible interval.
+% This has no jumping but will exclude border values even when they have
+% the highest posterior. Additionally it will not choose the area of
+% highest posterior density if the distribution is skewed. 
+
 
 %% options.betaPrior      = 20
 % this sets the strength of the Prior in favor of a binomial observer.
