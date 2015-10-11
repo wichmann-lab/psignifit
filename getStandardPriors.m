@@ -19,6 +19,9 @@ if numel(options.stimulusRange)<=1
     stimRangeSet = false;
 else 
     stimRangeSet = true;
+    if options.logspace
+        options.stimulusRange = log(options.stimulusRange);
+    end
 end
 
 %% threshold

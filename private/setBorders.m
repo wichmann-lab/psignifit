@@ -35,9 +35,12 @@ end
 % if range was not given take from data
 if numel(options.stimulusRange)<=1
     options.stimulusRange = [min(data(:,1)),max(data(:,1))];
-    stimRangeSet = true;
-else 
     stimRangeSet = false;
+else 
+    stimRangeSet = true;
+    if options.logspace
+        options.stimulusRange = log(options.stimulusRange);
+    end
 end
 
 % We then assume it is one of the reparameterized functions with
