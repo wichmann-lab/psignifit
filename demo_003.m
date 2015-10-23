@@ -1,4 +1,4 @@
-%% demo_006 fields of the results struct - Which information is contained in the result of Psignifit
+%% demo_003 fields of the results struct - Which information is contained in the result of Psignifit
 
 % to have some data we use the data from demo_001
 data =    [...

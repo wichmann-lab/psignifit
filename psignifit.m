@@ -8,16 +8,16 @@ function result=psignifit(data,options)
 %       [x-value, number correct, number of trials]
 %
 % options should be a 1x1 struct in which you set the options for your fit.
-% You can find a full overview over the options in demo_002
+% You can find a full overview over the options in demo002
 %
 % The result of this function is a struct, which contains all information
 % the program produced for your fit. You can pass this as whole to all
 % further processing function provided with psignifit. Especially to the
 % plot functions.
-% You can find an explanation for all fields of the result in demo_003
+% You can find an explanation for all fields of the result in demo006
 %
 %
-% To get an introduction to basic useage start with demo_001
+% To get an introduction to basic useage start with demo001
 
 
 
@@ -31,29 +31,30 @@ end
 
 
 %% options
-if ~exist('options','var'),                  options=struct;                    end
-if ~isfield(options,'sigmoidName'),          options.sigmoidName    = 'norm';   end
-if ~isfield(options,'expType'),              options.expType        = 'YesNo';  end
-if ~isfield(options,'estimateType'),         options.estimateType   = 'MAP';    end
-if ~isfield(options,'confP'),                options.confP          = .95;      end
-if ~isfield(options,'instantPlot'),          options.instantPlot    = 0;        end
-if ~isfield(options,'setBordersType'),       options.setBordersType = 0;        end
-if ~isfield(options,'maxBorderValue'),       options.maxBorderValue = exp(-7);  end
-if ~isfield(options,'moveBorders'),          options.moveBorders    = 1;        end
-if ~isfield(options,'dynamicGrid'),          options.dynamicGrid    = 0;        end
-if ~isfield(options,'widthalpha'),           options.widthalpha     = .05;      end
-if ~isfield(options,'CImethod'),             options.CImethod       = 'stripes';end
-if ~isfield(options,'gridSetType'),          options.gridSetType    = 'cumDist';end
-if ~isfield(options,'fixedPars'),            options.fixedPars      = nan(5,1); end
-if ~isfield(options,'nblocks'),              options.nblocks        = 35;       end
-if ~isfield(options,'useGPU'),               options.useGPU         = 0;        end
-if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = inf;      end
-if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = inf;      end
-if ~isfield(options,'poolxTol'),             options.poolxTol       = 0;        end
-if ~isfield(options,'betaPrior'),            options.betaPrior      = 10;       end
-if ~isfield(options,'verbose'),              options.verbose        = 0;        end
-if ~isfield(options,'stimulusRange'),        options.stimulusRange  = 0;        end
-if ~isfield(options,'fastOptim'),            options.fastOptim      = false;    end
+if ~exist('options','var'),                  options=struct;                          end
+if ~isfield(options,'sigmoidName'),          options.sigmoidName    = 'norm';         end
+if ~isfield(options,'expType'),              options.expType        = 'YesNo';        end
+if ~isfield(options,'estimateType'),         options.estimateType   = 'MAP';          end
+if ~isfield(options,'confP'),                options.confP          = [0.95,0.9,.68]; end
+if ~isfield(options,'instantPlot'),          options.instantPlot    = 0;              end
+if ~isfield(options,'setBordersType'),       options.setBordersType = 0;              end
+if ~isfield(options,'maxBorderValue'),       options.maxBorderValue = .00001;         end
+if ~isfield(options,'moveBorders'),          options.moveBorders    = 1;              end
+if ~isfield(options,'dynamicGrid'),          options.dynamicGrid    = 0;              end
+if ~isfield(options,'widthalpha'),           options.widthalpha     = .05;            end
+if ~isfield(options,'threshPC'),             options.threshPC       = .5;             end
+if ~isfield(options,'CImethod'),             options.CImethod       = 'percentiles';  end
+if ~isfield(options,'gridSetType'),          options.gridSetType    = 'cumDist';      end
+if ~isfield(options,'fixedPars'),            options.fixedPars      = nan(5,1);       end
+if ~isfield(options,'nblocks'),              options.nblocks        = 25;             end
+if ~isfield(options,'useGPU'),               options.useGPU         = 0;              end
+if ~isfield(options,'poolMaxGap'),           options.poolMaxGap     = inf;            end
+if ~isfield(options,'poolMaxLength'),        options.poolMaxLength  = inf;            end
+if ~isfield(options,'poolxTol'),             options.poolxTol       = 0;              end
+if ~isfield(options,'betaPrior'),            options.betaPrior      = 10;             end
+if ~isfield(options,'verbose'),              options.verbose        = 0;              end
+if ~isfield(options,'stimulusRange'),        options.stimulusRange  = 0;              end
+if ~isfield(options,'fastOptim'),            options.fastOptim      = false;          end
 
 
 
@@ -108,7 +109,7 @@ end
 % fit our expectations better then.
 % The flag is needed for the setting of the parameter bounds in setBorders
 
-if any(strcmpi(options.sigmoidName,{'Weibull','logn'}))
+if any(strcmpi(options.sigmoidName,{'Weibull','logn','weibull'}))
     options.logspace = 1;
     assert(min(data(:,1)) > 0, 'The sigmoid you specified is not defined for negative data points!');
 else
@@ -116,6 +117,10 @@ else
 end
 
 % add priors
+if options.threshPC  ~= .5 && ~isfield(options,'priors')
+    warning('psignifit:ThresholdPCchanged','You changed the percent correct corresponding to the threshold\n please check that the prior is still sensible!')
+end
+
 if ~isfield(options,'priors')
     options.priors         = getStandardPriors(data,options);
 else 
@@ -146,6 +151,16 @@ if options.dynamicGrid && ~isfield(options,'UniformWeight'), options.UniformWeig
 
 
 %% initialize
+
+% Warning if many blocks were measured -> adaptive sampling?
+if length(unique(data(:,1))) >= 25 && numel(options.stimulusRange)==1
+    warning('psignifit:probablyAdaptive', 'The data you supplied contained >= 25 stimulus levels.\n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
+end
+% Warning if few trials per block -> adaptive sampling
+if all(data(:,3)<=5) && numel(options.stimulusRange)==1
+    warning('psignifit:probablyAdaptive', 'All provided data blocks contain <= 5 trials \n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
+end
+
 
 % pool data if necessary
 % -> more than options.nblocks blocks or only 1 trial per block
@@ -194,8 +209,7 @@ if options.verbose > -5
     if result.marginals{1}(1).* result.marginalsW{1}(1) > .001
         warning('psignifit:borderWarning',...
            ['The marginal for the threshold is not near 0 at the lower border\n',...
-            'This indicates that your data is not fully sufficient to exclude much lower thresholds.\n',...
-            'Refer to the paper or the manual for more info on this topic'])
+            'This indicates that smaller Thresholds would be possible'])
     end
     if result.marginals{1}(end).* result.marginalsW{1}(end) > .001
         warning('psignifit:borderWarning',...
