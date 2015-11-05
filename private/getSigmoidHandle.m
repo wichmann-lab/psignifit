@@ -14,39 +14,41 @@ if isstruct(options)
     if ~isfield(options,'widthalpha'), options.widthalpha = .05; end
     alpha   = options.widthalpha;
     sigmoid = options.sigmoidName;
+    PC      = options.threshPC;
 elseif ischar(options)
     sigmoid = options;
     alpha   = .05;
+    PC      = .5;
 end
 
 if ischar(sigmoid)
     switch sigmoid
         case {'norm','gauss'}   % cumulative normal distribution
             C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
-            Handle = @(X, m, width) my_normcdf(X, m, width ./ C);
+            Handle = @(X, m, width) my_normcdf(X, m-my_norminv(PC,0,width./C), width ./ C);
         case 'logistic'         % logistic function
-            Handle = @(X, m, width) 1 ./ (1 + exp(-2 * log(1./alpha - 1) ./ width .* (X-m)));
+            Handle = @(X, m, width) 1 ./ (1 + exp(-2 * log(1./alpha - 1) ./ width .* (X-m) + log(1./PC - 1)));
         case 'gumbel'           % gumbel
-            % note that gumbel and reversed gumbel definitions are sometimesswapped
+            % note that gumbel and reversed gumbel definitions are sometimes swapped
             % and sometimes called extreme value distributions
             C      = log(-log(alpha)) - log(-log(1-alpha));
-            Handle = @(X, m, width) 1 - exp(-exp(C ./ width .* (X-m) + log(-log(.5))));
+            Handle = @(X, m, width) 1 - exp(-exp(C ./ width .* (X-m) + log(-log(1-PC))));
         case 'rgumbel'          % reversed gumbel 
             % note that gumbel and reversed gumbel definitions are sometimesswapped
             % and sometimes called extreme value distributions
             C      = log(-log(1-alpha)) - log(-log(alpha));
-            Handle = @(X, m, width) exp(-exp( C ./ width .* (X-m) + log(-log(.5))));
+            Handle = @(X, m, width) exp(-exp( C ./ width .* (X-m) + log(-log(PC))));
         case 'logn'             % cumulative lognormal distribution
             C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
-            Handle = @(X, m, width) my_normcdf(log(X), m, width ./ C);
+            Handle = @(X, m, width) my_normcdf(log(X), m-my_norminv(PC,0,width./C), width ./ C);
         case {'Weibull','weibull'} % Weibull
             C      = log(-log(alpha)) - log(-log(1-alpha));
-            Handle = @(X, m, width) 1 - exp(-exp(C./ width .* (log(X)-m) + log(-log(.5))));
+            Handle = @(X, m, width) 1 - exp(-exp(C./ width .* (log(X)-m) + log(-log(1-PC))));
         case {'tdist','student','heavytail'} 
                                 % student T distribution with 1 df
                                 %-> heavy tail distribution
             C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));
-            Handle = @(X, m, width) my_t1cdf(C.*(X-m)./ width);
+            Handle = @(X, m, width) my_t1cdf(C.*(X-m)./ width + my_t1icdf(PC));
         otherwise
             error('unknown sigmoid function');
     end
