@@ -3,8 +3,10 @@ psignifit
 
 Toolbox for Bayesian psychometric function estimation
 
-    Copyright (C) 2014 Heiko Schütt
-
+    (c) Heiko Schütt, AG NIP, University of Tübingen
+    www.wichmann-lab.org
+    with help from Stefan Harmeling, Jakob Macke and Felix Wichmann
+    
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
