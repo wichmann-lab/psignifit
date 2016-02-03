@@ -1,21 +1,10 @@
 function plotsModelfit(res)
 %function plotsModelfit(res)
 % plots some standard plots, meant to help you judge whether there are
-% systematic deviations from the model. We dropped the statistical tests
-% here though.
-%
-% The left plot shows the psychometric function with the data. 
-%
-% The central plot shows the Deviance residuals against the stimulus level. 
-% Systematic deviations from 0 here would indicate that the measured data
-% shows a different shape than the fitted one.
-% 
-% The right plot shows the Deviance residuals against "time", e.g. against
-% the order of the passed blocks. A trend in this plot would indicate
-% learning/ changes in performance over time. 
+% systematic deviations from the model.
 %
 % These are the same plots as presented in psignifit 2 for this purpose.
-
+%
 
 stimRange = [min(res.data(:,1)),max(res.data(:,1))];
 stimRange = [1.1*stimRange(1)-.1*stimRange(2),1.1*stimRange(2)-.1*stimRange(1)];

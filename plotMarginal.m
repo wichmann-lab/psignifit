@@ -3,7 +3,7 @@ function h=plotMarginal(result,dim,plotOptions)
 %function plotMarginal(result,dim,plotOptions)
 %  result       should be a result struct from the main psignifit routine
 %  dim          is the parameter to plot
-%                   1=threshold,2=width,3=lambda,4=gamma,5=sigma
+%                   1=threshold,2=width,3=lambda,4=gamma,5=eta
 %  plotOPtions  a struct with additional options for the plot
 % This always plots into gca
 
@@ -51,7 +51,7 @@ if isempty(plotOptions.xLabel)
         case 4
             plotOptions.xLabel='\gamma';
         case 5
-            plotOptions.xLabel='\sigma';
+            plotOptions.xLabel='\eta';
     end
 end
 

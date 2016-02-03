@@ -10,7 +10,7 @@ function h = plot2D(result,par1,par2,plotOptions)
 % 2 = width
 % 3 = lambda
 % 4 = gamma
-% 5 = sigma
+% 5 = eta
 %
 % As plotOptions an struct of further options may be passed.
 %
@@ -55,7 +55,7 @@ if ~isfield(plotOptions,'label1')
         case 4
             plotOptions.label1 = '\gamma';
         case 5
-            plotOptions.label1 = '\sigma';
+            plotOptions.label1 = '\eta';
     end
 end
 if ~isfield(plotOptions,'label2')
@@ -69,7 +69,7 @@ if ~isfield(plotOptions,'label2')
         case 4
             plotOptions.label2 = '\gamma';
         case 5
-            plotOptions.label2 = '\sigma';
+            plotOptions.label2 = '\eta';
     end
 end
 

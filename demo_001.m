@@ -96,5 +96,4 @@ plotPsych(res);
 result = rmfield(res,{'Posterior','weight'});
 
 % without these fields you will not be able to use the 2D Bayesian plots
-% anymore and the equalityTest will fail. All other functions work without
-% it.
+% anymore. All other functions work without it.

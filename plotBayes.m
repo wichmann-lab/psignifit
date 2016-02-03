@@ -58,7 +58,7 @@ for i = 1:4
             case 4
                 xlabel('\gamma');
             case 5
-                xlabel('\sigma');
+                xlabel('\eta');
         end
         
         handle = {@(~,~,result,plotOptions)onePlot(result,i,j,plotOptions),result,plotOptions};
@@ -103,7 +103,7 @@ else
         case 4
             xlabel('\gamma','FontSize',14);
         case 5
-            xlabel('\sigma','FontSize',14);
+            xlabel('\eta','FontSize',14);
     end
 end
 % if clicked go back to main display

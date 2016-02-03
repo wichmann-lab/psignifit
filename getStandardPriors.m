@@ -58,7 +58,7 @@ priors{2} = @(x) ((x.*Cfactor)>=widthmin).*((x.*Cfactor)<=2*widthmin).*(.5-.5*co
 priors{3} = @(x) my_betapdf(x,1,10);
 priors{4} = @(x) my_betapdf(x,1,10);
 
-%% sigma
+%% eta
 be = options.betaPrior;
 priors{5} = @(x) my_betapdf(x,1,be);
 
