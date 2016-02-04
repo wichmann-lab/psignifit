@@ -120,26 +120,38 @@ options.stepN=[40,40,50,20,20];
 
 %% options.confP          = .95
 % The confidence level for the computed confidence intervals.
-% this may be set to any number between 0 and 1 excluding.
+% This may be set to any number between 0 and 1 excluding.
 
 % for example to get 99% confidence intervals try 
 options.confP          = .99;
 
-% you may specify a vector as well. If you do the conf_intervals in the
-% result will be a 5x2xN array containting the values for the different
+% You may specify a vector as well. If you do the conf_intervals in the
+% result will be a 5x2xN array containing the values for the different
 % confidence levels in the 3rd dimension. 
 
 options.confP = [.95,.9,.68,.5];
 % will return 4 confidence intervals for each parameter for example.
 
+
+
+%% options.threshPC       = .5
+% Which percent correct correspond to the threshold? 
+% Given in Percent correct on the unscaled sigmoid (reaching from 0 to 1).
+
+% For example to define the threshold as 90% correct try:  
+
+options.threshPC       = .9;
+
+
+
 %% options.CImethod       ='stripes'
-% this sets how the confidence intervals are computed in getConfRegion.m
-%possible variants are:
+% This sets how the confidence intervals are computed in getConfRegion.m
+% possible variants are:
 %       'project' -> project the confidence region on each axis
 
 %       'stripes' -> find a threshold with (1-alpha) above it
 
-% this will disregard intervals of low posterior probability and then move
+% This will disregard intervals of low posterior probability and then move
 % in from the sides to adjust the exact CI size.
 % This can handle borders and asymmetric distributions slightly better, but
 % will introduce slight jumps of the confidence interval when confp is
@@ -154,6 +166,14 @@ options.confP = [.95,.9,.68,.5];
 % This has no jumping but will exclude border values even when they have
 % the highest posterior. Additionally it will not choose the area of
 % highest posterior density if the distribution is skewed. 
+
+%% options.priors  = getStandardPriors()
+% This field contains a cell array of function handles, which define the
+% priors for each parameter.
+% If you want to set your priors manually, here is the place for it.
+
+% For details on how do change these refer to 
+% https://github.com/wichmann-lab/psignifit/wiki/Priors
 
 
 %% options.betaPrior      = 20

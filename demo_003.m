@@ -37,12 +37,12 @@ res=psignifit(data,options);
 % Which kind of fit was performed is determined by the options you set. 
 % It might be mean, median or MAP.
 % The order of reported parameters is
-% [threshold,width,lambda,gamma,sigma]
+% [threshold,width,lambda,gamma,eta]
 
 %% res.conf_Intervals = confidence intervals for the fit
 % the confidence intervals for the 5 parameters.  
 % The order of reported parameters is
-% [threshold,width,lambda,gamma,sigma]
+% [threshold,width,lambda,gamma,eta]
 
 %% res.data = data used for the fit
 % the array used as data input for psignifit

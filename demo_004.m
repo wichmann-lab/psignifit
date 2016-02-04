@@ -67,6 +67,7 @@ plotPrior(res);
 % Thus the assumption that we know that the threshold is in the range of
 % the data is clearly violated. 
 
+
 data=[...
     1.5000    3.0000    3.0000;...
     1.3500    3.0000    3.0000;...
@@ -134,10 +135,14 @@ plotPrior(resRange);
 figure;
 plotMarginal(resRange,1);
 
-% Finally we can also have a look on the new fitted psychometric function,
-% to see that it now fits the generating value much better.
+% Finally we can also compare our new fitted psychometric function,
+% to see that even the point estimate for the psychometric function was
+% influenced by the prior here:
 figure;
 plotPsych(resRange);
+hold on
+plotPsych(res);
+
 
 %% The prior on the betabinomial variance- adjusting how conservative to be
 % With the betabinomial model we have an additional parameter which
@@ -194,7 +199,7 @@ options.betaPrior = 200;
 res200 = psignifit(data,options);
 
 % First see that the only parameter whose fit changes by this is the
-% beta-variance parameter sigma (the 5th)
+% beta-variance parameter eta (the 5th)
 res1.Fit
 res200.Fit
 
@@ -250,4 +255,7 @@ res = psignifit(data,options);
 % values. This is true, but we intend it to be like this, constraining our
 % analysis stronger than the standard priors do. 
 
-% With these commands you have set the priors manually. 
+% With these commands you have set the priors manually: Have a look at
+% them:
+plotPrior(res);
+

@@ -60,7 +60,7 @@ getThreshold(res,0.5,1)
 %% Obtaining slope values
 % We also provide two functions to calculate the slope of the psychometric
 % function from the fits.
-% These functions provdie no credible intervals.
+% These functions provide no credible intervals.
 
 % getSlope(res,stimLevel), will calculate the slope at a given stimulus
 % level. 
@@ -229,7 +229,7 @@ biasAna(data21,data22,options)
 
 % As this kind of bias leads to relatively undisturbed inference for 
 % threshold and width, the estimates from the original function might still
-% be useable.
+% be usable.
 
 % Now we have a look at our third splitting:
 biasAna(data31,data32,options)
@@ -264,9 +264,9 @@ biasAna(data31,data32,options)
 %% plotsModelfit
 % We offer you a function which creates the plots psignifit 2 created for
 % checking the modelfit.
-% It can be run as follows:
+% It can be run with the following command follows:
 
-plotsModelfit(result)
+plotsModelfit(res)
 
 % This method will show you three plots, based on the deviance residuals,
 % which are the normalized deviations from the fitted psychometric function:

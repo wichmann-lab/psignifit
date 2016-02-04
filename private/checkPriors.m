@@ -38,7 +38,7 @@ end
 
 %% on lambda 
 % values 0 to .9
-testValues = linspace(0,.9,25);
+testValues = linspace(0.001,.9,25);
 
 testresult = options.priors{3}(testValues);
 
@@ -50,7 +50,7 @@ end
 
 %% on gamma
 % values 0 to .9
-testValues = linspace(0,.9,25);
+testValues = linspace(0.0001,.9,25);
 
 testresult = options.priors{4}(testValues);
 
@@ -60,16 +60,16 @@ if any(testresult==0)
     warning('the prior you provided for the gamma returns zeros');
 end
 
-%% on sigma
+%% on eta
 % values 0 to .9
 testValues = linspace(0,.9,25);
 
 testresult = options.priors{5}(testValues);
 
-assert(all(isfinite(testresult)),'the prior you provided for sigma returns non-finite values');
-assert(all(testresult>=0),       'the prior you provided for sigma returns negative values');
+assert(all(isfinite(testresult)),'the prior you provided for eta returns non-finite values');
+assert(all(testresult>=0),       'the prior you provided for eta returns negative values');
 if any(testresult==0)
-    warning('the prior you provided for the sigma returns zeros');
+    warning('the prior you provided for the eta returns zeros');
 end
 
 

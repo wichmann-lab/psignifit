@@ -24,8 +24,7 @@ data =    [...
     0.0100,   90.0000,   90.0000];
 
 % remark: This format differs slightly from the format used in older
-% psignifit versions. You can convert your data by using the reformat
-% comand. If you are a user of the older psignifits.
+% psignifit versions. 
 
 %% construct an options struct
 % To start psignifit you need to pass a struct, which specifies, what kind
