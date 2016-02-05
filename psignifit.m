@@ -71,8 +71,14 @@ if strcmp(options.expType,'4AFC'),
     options.expN           = 4;        
 end
 
-
-
+if all(~isnan(options.fixedPars(3:4)))
+    if options.fixedPars(3)>(1-options.fixedPars(4))
+        error('You fixed the lapse rate and the guessing rate to values corresponding to a decreasing sigmoid, which is not supported');
+    end
+elseif any(~isnan(options.fixedPars(3:4)))
+    if ~isnan(options.fixedPars(3))
+    end
+end
 
 if strcmp(options.expType,'nAFC') && ~isfield(options,'expN');
     error('For nAFC experiments please also pass the number of alternatives (options.expN)'); end
@@ -80,18 +86,20 @@ if strcmp(options.expType,'nAFC') && ~isfield(options,'expN');
 switch options.expType
     case 'YesNo'
         if ~isfield(options,'stepN'),   options.stepN   = [40,40,20,20,20];  end
-        if ~isfield(options,'mbStepN'), options.mbStepN = [25,20,10,10,15];  end
+        if ~isfield(options,'mbStepN'), options.mbStepN = [25,30,10,10,15];  end
     case 'nAFC'
         if ~isfield(options,'stepN'),   options.stepN   = [40,40,20,1,20];   end
-        if ~isfield(options,'mbStepN'), options.mbStepN = [30,30,10,1,20];   end
+        if ~isfield(options,'mbStepN'), options.mbStepN = [30,40,10,1,20];   end
     case 'equalAsymptote'
         if ~isfield(options,'stepN'),   options.stepN   = [40,40,20,1,20];   end
-        if ~isfield(options,'mbStepN'), options.mbStepN = [30,30,10,1,20];   end
+        if ~isfield(options,'mbStepN'), options.mbStepN = [30,40,10,1,20];   end
     otherwise
         error('You specified an illegal experiment type')
 end
 
 assert(max(data(:,1)) > min(data(:,1)) , 'Your data does not have variance on the x-axis! This makes fitting impossible')
+
+
 
 % check gpuOptions
 if options.useGPU && ~gpuDeviceCount
@@ -156,20 +164,20 @@ if options.dynamicGrid && ~isfield(options,'UniformWeight'), options.UniformWeig
 if length(unique(data(:,1))) >= 25 && numel(options.stimulusRange)==1
     warning('psignifit:probablyAdaptive', 'The data you supplied contained >= 25 stimulus levels.\n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
 end
-% Warning if few trials per block -> adaptive sampling
-if all(data(:,3)<=5) && numel(options.stimulusRange)==1
-    warning('psignifit:probablyAdaptive', 'All provided data blocks contain <= 5 trials \n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
-end
-
 
 % pool data if necessary
 % -> more than options.nblocks blocks or only 1 trial per block
 if max(data(:, 3)) == 1 || size(data, 1) > options.nblocks
     warning('psignifit:pooling','We pooled your data, to avoid problems with n=1 blocks or to save time fitting because you have a lot of blocks\n You can force acceptence of your blocks by increasing options.nblocks');
     data = poolData(data,options);
-    options.nblocks = size(data, 1);
+    %options.nblocks = size(data, 1);
 else
-    options.nblocks = size(data, 1);
+    %options.nblocks = size(data, 1);
+end
+
+% Warning if few trials per block -> adaptive sampling
+if all(data(:,3)<=5) && numel(options.stimulusRange)==1
+    warning('psignifit:probablyAdaptive', 'All provided data blocks contain <= 5 trials \n Did you sample adaptively?\n If so please specify a range which contains the whole psychometric function in options.stimulusRange.\n This will allow psignifit to choose an appropriate prior.\n For now we use the standard heuristic, assuming that the psychometric function is covered by the stimulus levels\n, which is frequently invalid for adaptive procedures!')
 end
 
 % create function handle to the sigmoid
@@ -195,6 +203,10 @@ if options.moveBorders
     options.borders = moveBorders(data,options);
 end
 
+% Warning for high confidence values
+if any(options.confP > 0.95)
+    warning('psingifit:confPLarge','You requested a confidence with higher confidence than 95%%. This was not thoroughly tested.');
+end
 
 
 %% core
