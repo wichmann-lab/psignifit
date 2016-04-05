@@ -99,18 +99,6 @@ end
 
 assert(max(data(:,1)) > min(data(:,1)) , 'Your data does not have variance on the x-axis! This makes fitting impossible')
 
-
-
-% check gpuOptions
-if options.useGPU && ~gpuDeviceCount
-    warning('You wanted to use your GPU but MATLAB does not recognize any useable GPU. We thus disabled GPU useage')
-    options.useGPU=0;
-end
-if options.useGPU
-    gpuDevice(options.useGPU);
-end
-
-
 % log space sigmoids
 % we fit these functions with a log transformed physical axis
 % This is because it makes the paramterization easier and also the priors
@@ -124,16 +112,54 @@ else
     options.logspace=0;
 end
 
+
+% if range was not given take from data
+if numel(options.stimulusRange)<=1
+    if options.logspace
+        options.stimulusRange = log([min(data(:,1)),max(data(:,1))]);
+    else
+        options.stimulusRange = [min(data(:,1)),max(data(:,1))];
+    end
+    stimRangeSet = false;
+else
+    stimRangeSet = true;
+    if options.logspace
+        options.stimulusRange = log(options.stimulusRange);
+    end
+end
+
+if ~isfield(options,'widthmin')
+    if length(unique(data(:,1)))>1 && ~stimRangeSet
+        if options.logspace
+            options.widthmin  = min(diff(sort(unique(log(data(:,1))))));
+        else
+            options.widthmin  = min(diff(sort(unique(data(:,1)))));
+        end
+    else
+        options.widthmin = 100*eps(options.stimulusRange(2));
+    end
+end
+
+% check gpuOptions
+if options.useGPU && ~gpuDeviceCount
+    warning('You wanted to use your GPU but MATLAB does not recognize any useable GPU. We thus disabled GPU useage')
+    options.useGPU=0;
+end
+if options.useGPU
+    gpuDevice(options.useGPU);
+end
+
+
 % add priors
 if options.threshPC  ~= .5 && ~isfield(options,'priors')
     warning('psignifit:ThresholdPCchanged','You changed the percent correct corresponding to the threshold\n please check that the prior is still sensible!')
 end
 
 if ~isfield(options,'priors')
-    options.priors         = getStandardPriors(data,options);
+    options.priors         = getStandardPriors(options);
 else 
     if iscell(options.priors)
-        priors = getStandardPriors(data,options);
+        priors = getStandardPriors(options);
         % if provided priors are to short
         if length(options.priors)<5 
             options.priors = [options.priors,cell(1,5-length(options.priors))];
@@ -185,12 +211,12 @@ options.sigmoidHandle = getSigmoidHandle(options);
 
 % borders of integration
 if isfield(options, 'borders')
-    borders = setBorders(data,options);
+    borders = setBorders(options);
     options.borders(isnan(options.borders)) = borders(isnan(options.borders));
     options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
     options.borders(~isnan(options.fixedPars),2) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
 else
-    options.borders = setBorders(data,options);
+    options.borders = setBorders(options);
     options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
     options.borders(~isnan(options.fixedPars),2) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
 end

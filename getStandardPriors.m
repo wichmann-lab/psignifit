@@ -1,4 +1,4 @@
-function priors = getStandardPriors(data,options)
+function priors = getStandardPriors(options)
 % sets the standard Priors
 % function priors = getStandardPriors(data,options)
 % The priors set here are the ones used if the user does supply own priors.
@@ -8,21 +8,6 @@ function priors = getStandardPriors(data,options)
 
 priors = cell(5,1);
 
-%% treat logspace sigmoids
-if options.logspace
-    data(:,1) = log(data(:,1));
-end
-
-%% if range was not given take from data
-if numel(options.stimulusRange)<=1
-    options.stimulusRange = [min(data(:,1)),max(data(:,1))];
-    stimRangeSet = false;
-else 
-    stimRangeSet = true;
-    if options.logspace
-        options.stimulusRange = log(options.stimulusRange);
-    end
-end
 
 %% threshold
 xspread = options.stimulusRange(2)-options.stimulusRange(1);
@@ -36,11 +21,7 @@ priors{1} = @(x) (x>=(options.stimulusRange(1)-.5*xspread)).*(x<=options.stimulu
 
 %% width
 % minimum = minimal difference of two stimulus levels
-if length(unique(data(:,1)))>1 && ~stimRangeSet
-    widthmin  = min(diff(sort(unique(data(:,1)))));
-else
-    widthmin = 100*eps(options.stimulusRange(2));
-end
+widthmin = options.widthmin;
 % maximum = spread of the data
 widthmax  = xspread;
 % We use the same prior as we previously used... e.g. we use the factor by
