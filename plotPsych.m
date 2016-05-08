@@ -130,6 +130,9 @@ if plotOptions.plotAsymptote
 end
 
 if plotOptions.CIthresh
+    if result.options.logspace
+        result.conf_Intervals(1,:,1) = exp(result.conf_Intervals(1,:,1));
+    end
     plot(result.conf_Intervals(1,:,1),repmat(result.Fit(4)+.5*(1-result.Fit(3)-result.Fit(4)),1,2),'Color',plotOptions.lineColor)
     plot(repmat(result.conf_Intervals(1,1,1),1,2),repmat(result.Fit(4)+.5*(1-result.Fit(3)-result.Fit(4)),1,2)+[-.01,+.01],'Color',plotOptions.lineColor)
     plot(repmat(result.conf_Intervals(1,2,1),1,2),repmat(result.Fit(4)+.5*(1-result.Fit(3)-result.Fit(4)),1,2)+[-.01,+.01],'Color',plotOptions.lineColor)
