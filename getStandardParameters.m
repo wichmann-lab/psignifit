@@ -29,7 +29,10 @@ if ~exist('widthalpha','var'), widthalpha=.05; end
 if isstruct(theta)
     widthalpha = theta.options.widthalpha;
     type  = theta.options.sigmoidName;
-    theta = theta.Fit; 
+    if theta.options.threshPC~=.5
+        theta.Fit(1) = getThreshold(theta, .5, true);
+    end
+    theta = theta.Fit;
 end
 
 assert(logical(exist('type','var')),'You need to specify which kind of sigmoid you fit');
