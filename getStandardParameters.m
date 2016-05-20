@@ -53,15 +53,15 @@ switch type
     case {'gumbel'}
         % note that gumbel and reversed gumbel definitions are sometimes swapped
         % and sometimes called extreme value distributions
-        C        = log(-log(alpha)) - log(-log(1-alpha));
+        C        = log(-log(widthalpha)) - log(-log(1-widthalpha));
         theta(2) = theta(2)/C;
         theta(1) = theta(1)+theta(2).*log(-log(.5));
     case {'rgumbel'}
-        C      = log(-log(1-alpha)) - log(-log(alpha));
+        C      = log(-log(1-widthalpha)) - log(-log(widthalpha));
         theta(2) = -theta(2)./C;
         theta(1) = theta(1)-theta(2).*log(-log(.5));
     case {'tdist','student','heavytail'} 
-        C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));    
+        C      = (my_t1icdf(1-widthalpha) - my_t1icdf(widthalpha));    
         theta(1) = theta(1);
         theta(2) = theta(2)./C;
         
