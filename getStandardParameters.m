@@ -30,7 +30,11 @@ if isstruct(theta)
     widthalpha = theta.options.widthalpha;
     type  = theta.options.sigmoidName;
     if theta.options.threshPC~=.5
-        theta.Fit(1) = getThreshold(theta, .5, true);
+        if theta.options.logspace
+            theta.Fit(1) = log(getThreshold(theta, .5, true));
+        else
+            theta.Fit(1) = getThreshold(theta, .5, true);
+        end
     end
     theta = theta.Fit;
 end
@@ -47,10 +51,9 @@ switch type
         theta(2) = 2*log(1./widthalpha-1)./theta(2);
     case {'Weibull','weibull'}
         C        = log(-log(widthalpha)) - log(-log(1-widthalpha));
-        Handle   = @(X, m, width) 1 - exp(-exp(C./ width .* (log(X)-m) + log(-log(.5))));
         shape    = C./theta(2);
-        scale    = 1 - Handle(1,theta(1),theta(2));
-        scale    = exp(log(-1/log(scale))/shape); %Wikipediascale
+        scale    = exp(C./ theta(2) .* (-theta(1)) + log(-log(.5)));
+        scale    = exp(log(1/scale)/shape); %Wikipediascale
         theta(1) = scale;
         theta(2) = shape;
     case {'gumbel'}
@@ -58,11 +61,11 @@ switch type
         % and sometimes called extreme value distributions
         C        = log(-log(widthalpha)) - log(-log(1-widthalpha));
         theta(2) = theta(2)/C;
-        theta(1) = theta(1)+theta(2).*log(-log(.5));
+        theta(1) = theta(1)-theta(2).*log(-log(.5));
     case {'rgumbel'}
         C      = log(-log(1-widthalpha)) - log(-log(widthalpha));
         theta(2) = -theta(2)./C;
-        theta(1) = theta(1)-theta(2).*log(-log(.5));
+        theta(1) = theta(1)+theta(2).*log(-log(.5));
     case {'tdist','student','heavytail'} 
         C      = (my_t1icdf(1-widthalpha) - my_t1icdf(widthalpha));    
         theta(1) = theta(1);
