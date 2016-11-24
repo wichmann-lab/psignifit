@@ -38,10 +38,15 @@ box off
 
 subplot(1,3,2)
 % stimulus level vs. deviance
-stdModel = res.Fit(4)+(1-res.Fit(3)-res.Fit(4))*res.options.sigmoidHandle(res.data(:,1),res.Fit(1),res.Fit(2));
-deviance = res.data(:,2)./res.data(:,3)-stdModel;
-stdModel = sqrt(stdModel.*(1-stdModel));
-deviance = deviance./stdModel;
+pPred = res.psiHandle(res.data(:,1));
+pMeasured = res.data(:,2)./res.data(:,3);
+
+loglikelihoodPred = res.data(:,2).*log(pPred)+(res.data(:,3)-res.data(:,2)).*log((1-pPred));
+loglikelihoodMeasured = res.data(:,2).*log(pMeasured)+(res.data(:,3)-res.data(:,2)).*log((1-pMeasured));
+loglikelihoodMeasured(pMeasured==1) = 0;
+loglikelihoodMeasured(pMeasured==0) = 0;
+
+deviance= -2*sign(pMeasured-pPred).*(loglikelihoodMeasured - loglikelihoodPred);
 xValues = linspace(min(res.data(:,1)),max(res.data(:,1)),1000);
 
 plot(res.data(:,1),deviance,'k.','MarkerSize',20)
