@@ -65,8 +65,11 @@ end
 
 % get limits for the psychometric function plots
 
-xLimit = [res.options.stimulusRange(1)-.5*range,res.options.stimulusRange(2)+.5*range];
-
+if res.options.logspace
+    xLimit = exp([res.options.stimulusRange(1)-.5*range,res.options.stimulusRange(2)+.5*range]);
+else
+    xLimit = [res.options.stimulusRange(1)-.5*range,res.options.stimulusRange(2)+.5*range];
+end
 % The first row shows the prior marginal densities
 
 %% threshold 
@@ -77,7 +80,7 @@ cthresh = cumsum(ythresh.*wthresh);
 subplot(2,3,1)
 plot(xthresh,ythresh,'LineWidth',lineW,'Color',lineC)
 hold on
-xlim(xLimit)
+xlim([min(xthresh),max(xthresh)])
 title('Threshold','FontSize',18)
 ylabel('Density','FontSize',18)
 
@@ -110,6 +113,9 @@ for idot= 1:5
     y = 100*(theta(4)+ (1-theta(3)-theta(4)).* res.options.sigmoidHandle(x,xcurrent,theta(2)));
     subplot(2,3,4)
     plot(x,y,'-','LineWidth',lineW,'Color',color)
+    if res.options.logspace
+        set(gca,'XScale','log')
+    end
     subplot(2,3,1)
     plot(xcurrent,res.options.priors{1}(xcurrent),'Color',color,'LineStyle','none','Marker','.','MarkerSize',markerSize)
 end
@@ -156,6 +162,9 @@ for idot= 1:5
     y = 100*(theta(4)+ (1-theta(3)-theta(4)).* res.options.sigmoidHandle(x,theta(1),xcurrent));
     subplot(2,3,5)
     plot(x,y,'-','LineWidth',lineW,'Color',color)
+    if res.options.logspace
+        set(gca,'XScale','log')
+    end
     subplot(2,3,2)
     plot(xcurrent,res.options.priors{2}(xcurrent),'Color',color,'LineStyle','none','Marker','.','MarkerSize',markerSize)
 end
@@ -200,6 +209,9 @@ for idot= 1:5
     y = 100*(theta(4)+ (1-xcurrent-theta(4)).* res.options.sigmoidHandle(x,theta(1),theta(2)));
     subplot(2,3,6)
     plot(x,y,'-','LineWidth',lineW,'Color',color)
+    if res.options.logspace
+        set(gca,'XScale','log')
+    end
     subplot(2,3,3)
     plot(xcurrent,res.options.priors{3}(xcurrent),'Color',color,'LineStyle','none','Marker','.','MarkerSize',markerSize)
 end
