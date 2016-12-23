@@ -90,9 +90,11 @@ switch options.expType
     case 'nAFC'
         if ~isfield(options,'stepN'),   options.stepN   = [40,40,20,1,20];   end
         if ~isfield(options,'mbStepN'), options.mbStepN = [30,40,10,1,20];   end
+        assert((options.mbStepN(4) == 1) && (options.stepN(4) == 1), 'For nAFC experiments gamma is fixed. The number of gridpoints for it must be 1!')
     case 'equalAsymptote'
         if ~isfield(options,'stepN'),   options.stepN   = [40,40,20,1,20];   end
         if ~isfield(options,'mbStepN'), options.mbStepN = [30,40,10,1,20];   end
+        assert((options.mbStepN(4) == 1) && (options.stepN(4) == 1), 'For equal asymptote experiments gamma is fixed equal to lambda. The number of gridpoints for it must be 1!')
     otherwise
         error('You specified an illegal experiment type')
 end
