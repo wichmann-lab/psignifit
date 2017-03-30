@@ -413,11 +413,11 @@ options = struct;
 options.expType = '2AFC';
 options.sigmoidName = 'norm';
 options.stimulusRange = [.25,1.75];
-res = psignifit(data,options);
+result = psignifit(data,options);
 % Note that this took a bit longer than usual.
 % Let's have a look at what psignifit did automatically here:
 
-plotPsych(res)
+plotPsych(result)
 
 % Each block contains only very few trials  Thus the beta-binomial model 
 % cannot help much to correct for overdispersion. Furthermore the many 
@@ -432,11 +432,12 @@ plotPsych(res)
 % levels. Furthermore it stops collecting trials for a block once the block
 % contains options.poolMaxLength trials.
 
-% The default settings for the pooling behaviour are:
-res.options.poolxTol
-res.options.poolMaxGap
-res.options.poolMaxLength
-res.options.nblocks 
+% The default settings for the pooling behaviour are saved in the options 
+% field of the result:
+result.options.poolxTol
+result.options.poolMaxGap
+result.options.poolMaxLength
+result.options.nblocks 
 
 % This means that by default psignifit pooled only trials collected 
 % at the exact same stimulus level, but all of them.

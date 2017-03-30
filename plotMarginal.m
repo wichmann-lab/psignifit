@@ -1,6 +1,6 @@
-function h=plotMarginal(result,dim,plotOptions)
+function hline = plotMarginal(result,dim,plotOptions)
 % plots the marginal for a single dimension
-%function plotMarginal(result,dim,plotOptions)
+%function hline = plotMarginal(result,dim,plotOptions)
 %  result       should be a result struct from the main psignifit routine
 %  dim          is the parameter to plot
 %                   1=threshold,2=width,3=lambda,4=gamma,5=eta
@@ -93,7 +93,7 @@ if plotOptions.prior
 end
 
 %posterior
-plot(x,marginal,'LineWidth',plotOptions.lineWidth,'Color',plotOptions.lineColor);
+hline = plot(x,marginal,'LineWidth',plotOptions.lineWidth,'Color',plotOptions.lineColor);
 % point estimate
 if plotOptions.plotPE
     plot([Fit;Fit],[0;interp1(x,marginal,Fit)],'k');

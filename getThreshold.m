@@ -7,6 +7,10 @@ function [threshold,CI] = getThreshold(result, pCorrect, unscaled)
 %
 % pCorrect is the percent correct at the threshold you want to calculate
 %
+% threshold returns the stimulus level at which pCorrect is reached
+% CI will return a nx2 array of n credible intervals for this threshold
+% value.
+%
 % unscaled is whether the percent correct you provide are for the unscaled
 % sigmoid or for the one scaled by lambda and gamma. By default this
 % function returns the one for the scaled sigmoid -> unscaled = false
@@ -42,7 +46,7 @@ if unscaled % set asymptotes to 0 for everything.
     CIs(3:4,:) = 0;
 end
 
-assert(pCorrect>theta0(4) && pCorrect<(1-theta0(3)), 'The threshold percent correct is not reached by the sigmoid!')
+assert(pCorrect>theta0(4) && pCorrect<(1-theta0(3)), 'The threshold percent correct is not reached by the function!')
 
 %% calculate point estimate threshold -> transform only result.Fit
 
@@ -53,30 +57,34 @@ if isfield(result.options,'threshPC')
 else
     PC = 0.5;
 end
+if strcmp(result.options.sigmoidName(1:3),'neg')
+    pCorrectUnscaled = 1-pCorrectUnscaled;
+    PC = 1-PC;
+end
 
 switch result.options.sigmoidName
-    case {'norm','gauss'}   % cumulative normal distribution
+    case {'norm','gauss','neg_norm','neg_gauss'}   % cumulative normal distribution
         C         = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
         threshold = my_norminv(pCorrectUnscaled, theta0(1)-my_norminv(PC,0,theta0(2)./C), theta0(2) ./ C);
-    case 'logistic'         % logistic function
+    case {'logistic','neg_logistic'}         % logistic function
         threshold = theta0(1)-theta0(2)*(log(1/pCorrectUnscaled-1)-log(1/PC-1))/2/log(1/alpha-1);
-    case 'gumbel'           % gumbel
-        % note that gumbel and reversed gumbel definitions are sometimesswapped
+    case {'gumbel','neg_gumbel'}           % gumbel
+        % note that gumbel and reversed gumbel definitions are sometimes swapped
         % and sometimes called extreme value distributions
         C      = log(-log(alpha)) - log(-log(1-alpha));
         threshold = theta0(1) + (log(-log(1-pCorrectUnscaled))-log(-log(1-PC)))*theta0(2)/C;
-    case 'rgumbel'          % reversed gumbel
-        % note that gumbel and reversed gumbel definitions are sometimesswapped
+    case {'rgumbel','neg_rgumbel'}           % reversed gumbel
+        % note that gumbel and reversed gumbel definitions are sometimes swapped
         % and sometimes called extreme value distributions
         C      = log(-log(1-alpha)) - log(-log(alpha));
         threshold = theta0(1) + (log(-log(pCorrectUnscaled))-log(-log(PC)))*theta0(2)/C;
-    case 'logn'             % cumulative lognormal distribution
+    case {'logn','neg_logn'}             % cumulative lognormal distribution
         C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
         threshold = exp(my_norminv(pCorrectUnscaled, theta0(1)-my_norminv(PC,0,theta0(2)./C), theta0(2) ./ C));
-    case {'Weibull','weibull'} % Weibull
+    case {'Weibull','weibull','neg_Weibull','neg_weibull'} % Weibull
         C      = log(-log(alpha)) - log(-log(1-alpha));
         threshold = exp(theta0(1)+theta0(2)/C*(log(-log(1-pCorrectUnscaled))-log(-log(1-PC))));
-    case {'tdist','student','heavytail'}
+    case {'tdist','student','heavytail','neg_tdist','neg_student','neg_heavytail'}
         % student T distribution with 1 df
         %-> heavy tail distribution
         C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));
@@ -89,44 +97,57 @@ end
 if nargout>1 % calculate CIs only if required
     warning('psignifit:getThresholdCIs','The CIs computed by this method are only upper bounds. For more accurate inference change threshPC in the options.');
     for iConfP = 1:numel(result.options.confP)
-        if pCorrectUnscaled > PC
-            thetaMin = [CIs(1,1,iConfP),CIs(2,1,iConfP),CIs(3,1,iConfP),CIs(4,1,iConfP),0];
-            thetaMax = [CIs(1,2,iConfP),CIs(2,2,iConfP),CIs(3,2,iConfP),CIs(4,2,iConfP),0];
+        
+        if strcmp(result.options.sigmoidName(1:3),'neg')
+            if pCorrectUnscaled < PC
+                thetaMax = [CIs(1,2,iConfP),CIs(2,1,iConfP),CIs(3,1,iConfP),CIs(4,2,iConfP),0];
+                thetaMin = [CIs(1,1,iConfP),CIs(2,2,iConfP),CIs(3,2,iConfP),CIs(4,1,iConfP),0];
+            else
+                thetaMax = [CIs(1,2,iConfP),CIs(2,2,iConfP),CIs(3,1,iConfP),CIs(4,2,iConfP),0];
+                thetaMin = [CIs(1,1,iConfP),CIs(2,1,iConfP),CIs(3,2,iConfP),CIs(4,1,iConfP),0];
+            end
+            pCorrMin = 1-(pCorrect-thetaMin(4))./(1-thetaMin(3)-thetaMin(4));
+            pCorrMax = 1-(pCorrect-thetaMax(4))./(1-thetaMax(3)-thetaMax(4));
         else
-            thetaMin = [CIs(1,1,iConfP),CIs(2,2,iConfP),CIs(3,1,iConfP),CIs(4,2,iConfP),0];
-            thetaMax = [CIs(1,2,iConfP),CIs(2,1,iConfP),CIs(3,2,iConfP),CIs(4,1,iConfP),0];
+            if pCorrectUnscaled > PC
+                thetaMin = [CIs(1,1,iConfP),CIs(2,1,iConfP),CIs(3,1,iConfP),CIs(4,2,iConfP),0];
+                thetaMax = [CIs(1,2,iConfP),CIs(2,2,iConfP),CIs(3,2,iConfP),CIs(4,1,iConfP),0];
+            else
+                thetaMin = [CIs(1,1,iConfP),CIs(2,2,iConfP),CIs(3,1,iConfP),CIs(4,2,iConfP),0];
+                thetaMax = [CIs(1,2,iConfP),CIs(2,1,iConfP),CIs(3,2,iConfP),CIs(4,1,iConfP),0];
+            end
+            pCorrMin = (pCorrect-thetaMin(4))./(1-thetaMin(3)-thetaMin(4));
+            pCorrMax = (pCorrect-thetaMax(4))./(1-thetaMax(3)-thetaMax(4));
         end
-        pCorrMin = (pCorrect-thetaMin(4))./(1-thetaMin(3)-thetaMin(4));
-        pCorrMax = (pCorrect-thetaMax(4))./(1-thetaMax(3)-thetaMax(4));
         switch result.options.sigmoidName
-            case {'norm','gauss'}   % cumulative normal distribution
+            case {'norm','gauss','neg_norm','neg_gauss'}   % cumulative normal distribution
                 C         = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
                 CI(iConfP,1)     = my_norminv(pCorrMin, thetaMin(1)-my_norminv(PC,0,thetaMin(2)./C), thetaMin(2) ./ C);
                 CI(iConfP,2)     = my_norminv(pCorrMax, thetaMax(1)-my_norminv(PC,0,thetaMax(2)./C), thetaMax(2) ./ C);
-            case 'logistic'         % logistic function
+            case {'logistic','neg_logistic'}         % logistic function
                 CI(iConfP,1)     = thetaMin(1)-thetaMin(2)*(log(1/pCorrMin-1)-log(1/PC-1))/2/log(1/alpha-1);
                 CI(iConfP,2)     = thetaMax(1)-thetaMax(2)*(log(1/pCorrMax-1)-log(1/PC-1))/2/log(1/alpha-1);
-            case 'gumbel'           % gumbel
+            case {'gumbel','neg_gumbel'}           % gumbel
                 % note that gumbel and reversed gumbel definitions are sometimesswapped
                 % and sometimes called extreme value distributions
                 C      = log(-log(alpha)) - log(-log(1-alpha));
                 CI(iConfP,1) = thetaMin(1) + (log(-log(1-pCorrMin))-log(-log(1-PC)))*thetaMin(2)/C;
                 CI(iConfP,2) = thetaMax(1) + (log(-log(1-pCorrMax))-log(-log(1-PC)))*thetaMax(2)/C;
-            case 'rgumbel'          % reversed gumbel
+            case {'rgumbel','neg_rgumbel'}           % reversed gumbel
                 % note that gumbel and reversed gumbel definitions are sometimesswapped
                 % and sometimes called extreme value distributions
                 C      = log(-log(1-alpha)) - log(-log(alpha));
                 CI(iConfP,1) = thetaMin(1) + (log(-log(pCorrMin))-log(-log(PC)))*thetaMin(2)/C;
                 CI(iConfP,2) = thetaMax(1) + (log(-log(pCorrMax))-log(-log(PC)))*thetaMax(2)/C;
-            case 'logn'             % cumulative lognormal distribution
+            case {'logn','neg_logn'}             % cumulative lognormal distribution
                 C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
                 CI(iConfP,1) = exp(my_norminv(pCorrMin, thetaMin(1)-my_norminv(PC,0,thetaMin(2)./C), thetaMin(2) ./ C));
                 CI(iConfP,2) = exp(my_norminv(pCorrMax, thetaMax(1)-my_norminv(PC,0,thetaMax(2)./C), thetaMax(2) ./ C));
-            case {'Weibull','weibull'} % Weibull
+            case {'Weibull','weibull','neg_Weibull','neg_weibull'} % Weibull
                 C      = log(-log(alpha)) - log(-log(1-alpha));
                 CI(iConfP,1) = exp(thetaMin(1)+thetaMin(2)/C*(log(-log(1-pCorrMin))-log(-log(1-PC))));
                 CI(iConfP,2) = exp(thetaMax(1)+thetaMax(2)/C*(log(-log(1-pCorrMax))-log(-log(1-PC))));
-            case {'tdist','student','heavytail'}
+            case {'tdist','student','heavytail','neg_tdist','neg_student','neg_heavytail'}
                 % student T distribution with 1 df
                 %-> heavy tail distribution
                 C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));

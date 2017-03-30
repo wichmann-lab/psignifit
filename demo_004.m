@@ -37,9 +37,9 @@ options = struct;
 options.expType='2AFC';
 options.sigmoidName = 'norm';
 
-res = psignifit(data,options);
+result = psignifit(data,options);
 
-plotPrior(res);
+plotPrior(result);
 
 % You should check that the assumptions we make for the heuristic to work
 % are actually true in the case of your data.

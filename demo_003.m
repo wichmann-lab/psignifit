@@ -22,53 +22,56 @@ options=struct;
 
 % and run psignifit
 
-res=psignifit(data,options);
-% now we can have a look at the res struct and all its fields
+result=psignifit(data,options);
+% now we can have a look at the result struct and all its fields
 
 
 %% list of result struct fields
 % Here we list all fields of the result struct in the format
-% options.[field]        = short description
+% result.[field]        = short description
 %
 % after it follow some explanation and allowed values
 
 
-%% res.Fit = the fitted parameter of the psychometric function
+%% result.Fit = the fitted parameter of the psychometric function
 % Which kind of fit was performed is determined by the options you set. 
 % It might be mean, median or MAP.
 % The order of reported parameters is
 % [threshold,width,lambda,gamma,eta]
+% Along the third dimension you find this credible intervals for the 
+% different confidence levels as set in options.confP. 
+% (default for options.confP = [.95,.9,.68])
 
-%% res.conf_Intervals = confidence intervals for the fit
+%% result.conf_Intervals = confidence intervals for the fit
 % the confidence intervals for the 5 parameters.  
 % The order of reported parameters is
 % [threshold,width,lambda,gamma,eta]
 
-%% res.data = data used for the fit
+%% result.data = data used for the fit
 % the array used as data input for psignifit
 
-%% res.options = the options struct used for the fit
+%% result.options = the options struct used for the fit
 % contains all options set for the fit including automatically set values
 
-%% res.timestamp = When the data result was created
+%% result.timestamp = When the data result was created
 
-%% res.Posterior = posterior density at the gridpoints
+%% result.Posterior = posterior density at the gridpoints
 % normalized Posterior density evaluated at the final gridpoints
 
-%% res.weight = integration weight for each gridpoint
+%% result.weight = integration weight for each gridpoint
 % this is the volume of parameter space each gridpoint "speaks for". This
 % is needed for integrations over the space.
 
-%% res.X1D = positions of the gridpoints on the 5 dimensions
+%% result.X1D = positions of the gridpoints on the 5 dimensions
 % a cell array of vectors
 
-%% res.marginals   = marginal densities for the 5 parameters
-%% res.marginalsX  = positions of the marginal evaluations
-%% res.marginalsW  = integration weight for each gridpoint
+%% result.marginals   = marginal densities for the 5 parameters
+%% result.marginalsX  = positions of the marginal evaluations
+%% result.marginalsW  = integration weight for each gridpoint
 % Used together these three represent the marginal posterior distributions
 
 
-%% res.logPmax, res.integral = normalization constants
+%% result.logPmax, result.integral = normalization constants
 % the maximal log-likelihood which is subtracted prior to computing the
 % exponential to avoid numerical problems 
 % and the integral over the likelihood accross the parameter space, used

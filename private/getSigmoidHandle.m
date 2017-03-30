@@ -20,6 +20,9 @@ elseif ischar(options)
     alpha   = .05;
     PC      = .5;
 end
+if strcmp(sigmoid(1:3),'neg')
+    PC = 1-PC;
+end
 
 if ischar(sigmoid)
     switch sigmoid
@@ -48,7 +51,34 @@ if ischar(sigmoid)
                                 % student T distribution with 1 df
                                 %-> heavy tail distribution
             C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));
-            Handle = @(X, m, width) my_t1cdf(C.*(X-m)./ width + my_t1icdf(PC));
+            Handle = @(X, m, width) my_t1cdf(C.*(X-m)./ width + my_t1icdf(PC));            
+        
+        case {'neg_norm','neg_gauss'}   % cumulative normal distribution
+            C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
+            Handle = @(X, m, width) 1-my_normcdf(X, m-my_norminv(PC,0,width./C), width ./ C);
+        case 'neg_logistic'         % logistic function
+            Handle = @(X, m, width) 1-(1 ./ (1 + exp(-2 * log(1./alpha - 1) ./ width .* (X-m) + log(1./PC - 1))));
+        case 'neg_gumbel'           % gumbel
+            % note that gumbel and reversed gumbel definitions are sometimes swapped
+            % and sometimes called extreme value distributions
+            C      = log(-log(alpha)) - log(-log(1-alpha));
+            Handle = @(X, m, width) 1-(1 - exp(-exp(C ./ width .* (X-m) + log(-log(1-PC)))));
+        case 'neg_rgumbel'          % reversed gumbel 
+            % note that gumbel and reversed gumbel definitions are sometimesswapped
+            % and sometimes called extreme value distributions
+            C      = log(-log(1-alpha)) - log(-log(alpha));
+            Handle = @(X, m, width) 1-exp(-exp( C ./ width .* (X-m) + log(-log(PC))));
+        case 'neg_logn'             % cumulative lognormal distribution
+            C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
+            Handle = @(X, m, width) 1-my_normcdf(log(X), m-my_norminv(PC,0,width./C), width ./ C);
+        case {'neg_Weibull','neg_weibull'} % Weibull
+            C      = log(-log(alpha)) - log(-log(1-alpha));
+            Handle = @(X, m, width) exp(-exp(C./ width .* (log(X)-m) + log(-log(1-PC))));
+        case {'neg_tdist','neg_student','neg_heavytail'} 
+                                % student T distribution with 1 df
+                                %-> heavy tail distribution
+            C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));
+            Handle = @(X, m, width) 1-my_t1cdf(C.*(X-m)./ width + my_t1icdf(PC));
         otherwise
             error('unknown sigmoid function');
     end

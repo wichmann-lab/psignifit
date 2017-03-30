@@ -38,7 +38,7 @@ options             = struct;   % initialize as an empty struct
 %Now you can set the different options with lines of the form
 %[name].[field] as in the following lines:
 
-options.sigmoidName = 'norm';   % choose a cumulative Gauss as the sigmoid
+options.sigmoidName = 'norm';   % choose a cumulative Gaussian as the sigmoid
 options.expType     = '2AFC';   % choose 2-AFC as the paradigm of the experiment
                                 % this sets the guessing rate to .5 and
                                 % fits the rest of the parameters
@@ -57,13 +57,13 @@ options.expType     = '2AFC';   % choose 2-AFC as the paradigm of the experiment
 % choosen by:
 % options.sigmoidName = ...
 % 
-% 'norm'        a cummulative gauss distribution
+% 'norm'        a cummulative Gaussian distribution
 % 'logistic'    a logistic function
 % 'gumbel'      a cummulative gumbel distribution
 % 'rgumbel'     a reversed gumbel distribution
 % 'tdist'       a t-distribution with df=1 as a heavytail distribution
 %
-% for positive stimulus levels which make sence on a log-scale:
+% for positive stimulus levels which make sense on a log-scale:
 % 'logn'        a cumulative lognormal distribution
 % 'Weibull'     a Weibull function
 
@@ -77,13 +77,32 @@ options.expType     = '2AFC';   % choose 2-AFC as the paradigm of the experiment
 % fitted function and can be passed to the many other functions in this
 % toolbox, to further process the results.
 
-res = psignifit(data,options);
+result = psignifit(data,options);
+
+%result is a struct which contains all information obtained from fitting your data. 
+%Perhaps of primary interest are the fit and the confidence intervals:
+
+result.Fit
+result.conf_Intervals
+
+% This gives you the basic result of your fit. The five values reported are:
+%    the threshold
+%    the width (difference between the 95 and the 5 percent point of the unscaled sigmoid)
+%    lambda, the upper asymptote/lapse rate
+%    gamma, the lower asymptote/guess rate
+%    eta, scaling the extra variance introduced (a value near zero indicates 
+%         your data to be basically binomially distributed, whereas values 
+%         near one indicate severely overdispersed data)
+% The field conf_Intervals returns credible intervals for the values provided 
+% in options.confP. By default these are 68%, 90% and 95%. With default settings 
+% you should thus receive a 5x2x3 array, which contains 3 sets of credible intervals 
+% (lower and upper end = 2 values) for each of the 5 parameters.
 
 %% visualize the results
 % For example you can use the result struct res to plot your psychometric
 % function with the data:
 
-plotPsych(res);
+plotPsych(result);
 
 
 
@@ -92,7 +111,7 @@ plotPsych(res);
 % large. If you run into Memory issues you can drop the Posterior from the
 % result with the following command.
 
-result = rmfield(res,{'Posterior','weight'});
+resultSmall = rmfield(result,{'Posterior','weight'});
 
 % without these fields you will not be able to use the 2D Bayesian plots
 % anymore. All other functions work without it.

@@ -73,7 +73,7 @@ getSlope(res,0.006)
 % For example: 
 getSlopePC(res,0.6)
 % Will yield the slope at the value where the psychometric function reaches
-% 60% correct (at 0.0034). This slope is 89.0673.
+% 60% correct (at 0.0034). This slope is 98.3160.
 
 % as for the getThreshold function, the unscaled option allows you to
 % specify the percent correct on the unscaled sigmoid instead. 

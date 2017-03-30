@@ -113,3 +113,4 @@ result = psignifit(data,options);
 %As a tool this function plots the actually used priors of the provided result struct.
 
     plotPrior(result);
+    

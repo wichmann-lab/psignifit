@@ -1,4 +1,4 @@
-function h = plotPsych(result,plotOptions)
+function [hline,hdata] = plotPsych(result,plotOptions)
 % plot your data with the fitted function
 %function plotPsych(result,plotOptions)
 % This function produces a plot of the fitted psychometric function with
@@ -83,9 +83,10 @@ if ~holdState
     cla(h);
 end
 hold on
+hdata = gobjects(size(result.data,1),1);
 if plotOptions.plotData
     for i=1:size(result.data,1)
-        plot(result.data(i,1),result.data(i,2)./result.data(i,3),'.','MarkerSize',sqrt(plotOptions.dataSize*result.data(i,3)),'Color',plotOptions.dataColor)
+        hdata(i) = plot(result.data(i,1),result.data(i,2)./result.data(i,3),'.','MarkerSize',sqrt(plotOptions.dataSize*result.data(i,3)),'Color',plotOptions.dataColor);
     end
 end
 
@@ -106,7 +107,7 @@ fitValuesLow    = (1-result.Fit(3)-result.Fit(4))*arrayfun(@(x) result.options.s
 fitValuesHigh   = (1-result.Fit(3)-result.Fit(4))*arrayfun(@(x) result.options.sigmoidHandle(x,result.Fit(1),result.Fit(2)),xHigh)+result.Fit(4);
 
 fitValues = (1-result.Fit(3)-result.Fit(4))*arrayfun(@(x) result.options.sigmoidHandle(x,result.Fit(1),result.Fit(2)),x)+result.Fit(4);
-plot(x,     fitValues,          'Color', plotOptions.lineColor,'LineWidth',plotOptions.lineWidth)
+hline = plot(x,     fitValues,          'Color', plotOptions.lineColor,'LineWidth',plotOptions.lineWidth);
 plot(xLow,  fitValuesLow,'--',  'Color', plotOptions.lineColor,'LineWidth',plotOptions.lineWidth)
 plot(xHigh, fitValuesHigh,'--', 'Color', plotOptions.lineColor,'LineWidth',plotOptions.lineWidth)
 

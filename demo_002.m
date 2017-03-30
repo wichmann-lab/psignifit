@@ -1,4 +1,4 @@
-% demo_002 fields of the options struct - Which options can one set?
+%% demo_002 fields of the options struct - Which options can one set?
 % This demo explains all fields of the options struct, e.g. which options
 % you can set for the fitting process as a user.
 
@@ -24,7 +24,7 @@ options=struct;
 
 % now or at any later time you can run a fit with this command.
 
-res=psignifit(data,options);
+result=psignifit(data,options);
 
 
 
@@ -96,7 +96,7 @@ options.expN           = 3;
 % the posterior. 
 options.estimateType   = 'MAP';
 
-% 'mean' The posterior mean. In a Bayesian sence a more suitable estimate.
+% 'mean' The posterior mean. In a Bayesian sense a more suitable estimate.
 % the expected value of the Posterior.
 
 options.estimateType   = 'mean';
@@ -118,7 +118,7 @@ options.stepN=[40,40,50,20,20];
 % and smooth curve for comparisons.
 
 
-%% options.confP          = .95
+%% options.confP          = [.95,.9,.68]
 % The confidence level for the computed confidence intervals.
 % This may be set to any number between 0 and 1 excluding.
 

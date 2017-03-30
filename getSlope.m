@@ -1,7 +1,7 @@
 function slope = getSlope(result, stimLevel)
 % function slope = getSlope(result, stimLevel, unscaled)
 % This function finds the slope of the psychometric function at a given
-% performance level in percent correct.
+% stimulus level.
 %
 % result is a result struct from psignifit
 %
@@ -26,42 +26,45 @@ else
     PC = 0.5;
 end
 
+if strcmp(result.options.sigmoidName(1:3),'neg')
+    PC = 1-PC;
+end
 % find the (normalized) stimulus level, where the given percent correct is
 % reached and evaluate slope there
 switch result.options.sigmoidName
-    case {'norm','gauss'}   % cumulative normal distribution
+    case {'norm','gauss','neg_norm','neg_gauss'}   % cumulative normal distribution
         C         = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
         normalizedStimLevel = (stimLevel-theta0(1))/theta0(2).*C;
         slopeNormalized = normpdf(normalizedStimLevel);
         slope = slopeNormalized *C./theta0(2);
-    case 'logistic'         % logistic function
+    case {'logistic','neg_logistic'}         % logistic function
         C = 2 * log(1./alpha - 1) ./ theta0(2);
         d = log(1/PC-1);
         slope = C.*exp(-C.*(stimLevel-theta0(1))+d)./(1+exp(-C.*(stimLevel-theta0(1))+d)).^2;
-    case 'gumbel'           % gumbel
-        % note that gumbel and reversed gumbel definitions are sometimesswapped
+    case {'gumbel','neg_gumbel'}           % gumbel
+        % note that gumbel and reversed gumbel definitions are sometimes swapped
         % and sometimes called extreme value distributions
         C      = log(-log(alpha)) - log(-log(1-alpha));
         stimLevel = C./theta0(2).*(stimLevel-theta0(1))+log(-log(1-PC));
         slope = C./theta0(2).*exp(-exp(stimLevel)).*exp(stimLevel);
-    case 'rgumbel'          % reversed gumbel
-        % note that gumbel and reversed gumbel definitions are sometimesswapped
+    case {'rgumbel','neg_rgumbel'}          % reversed gumbel
+        % note that gumbel and reversed gumbel definitions are sometimes swapped
         % and sometimes called extreme value distributions
         C      = log(-log(1-alpha)) - log(-log(alpha));
         stimLevel = C./theta0(2).*(stimLevel-theta0(1))+log(-log(PC));
         slope = -C./theta0(2).*exp(-exp(stimLevel)).*exp(stimLevel);
-    case 'logn'             % cumulative lognormal distribution
+    case {'logn','neg_logn'}             % cumulative lognormal distribution
         C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
         normalizedStimLevel = (log(stimLevel)-theta0(1))/theta0(2);
         slopeNormalized = normpdf(normalizedStimLevel);
         slope = slopeNormalized *C./theta0(2)./stimLevel; 
         
-    case {'Weibull','weibull'} % Weibull
+    case {'Weibull','weibull','neg_Weibull','neg_weibull'} % Weibull
         C      = log(-log(alpha)) - log(-log(1-alpha));
         stimLevelNormalized = C./theta0(2).*(log(stimLevel)-theta0(1))+log(-log(1-PC));
         slope = C./theta0(2).*exp(-exp(stimLevelNormalized)).*exp(stimLevelNormalized);
         slope = slope./stimLevel;
-    case {'tdist','student','heavytail'}
+    case {'tdist','student','heavytail','neg_tdist','neg_student','neg_heavytail'}
         % student T distribution with 1 df
         %-> heavy tail distribution
         C      = (my_t1icdf(1-alpha) - my_t1icdf(alpha));
@@ -72,3 +75,7 @@ switch result.options.sigmoidName
 end
 
 slope = (1-theta0(3)-theta0(4))*slope;
+
+if strcmp(result.options.sigmoidName(1:3),'neg')
+    slope = -slope;
+end
