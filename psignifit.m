@@ -14,7 +14,7 @@ function result=psignifit(data,options)
 % the program produced for your fit. You can pass this as whole to all
 % further processing function provided with psignifit. Especially to the
 % plot functions.
-% You can find an explanation for all fields of the result in demo006
+% You can find an explanation for all fields of the result in demo003
 %
 %
 % To get an introduction to basic useage start with demo001
