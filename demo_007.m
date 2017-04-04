@@ -10,7 +10,7 @@
 % To ease the transition from the old to the new version of psignifit we
 % provide a function called "PsignifitLegacyOptionsConverter.m".
 % 
-% Additionally psignifit 4 now expects the number of korrekt trials instead
+% Additionally psignifit 4 now expects the number of correct trials instead
 % of the proportion correct in the data matrix. 
 
 
