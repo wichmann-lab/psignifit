@@ -83,7 +83,11 @@ if ~holdState
     cla(h);
 end
 hold on
-hdata = gobjects(size(result.data,1),1);
+if verLessThan('matlab', 'R2013a')
+    hdata = zeros(size(result.data,1),1);
+else
+    hdata = gobjects(size(result.data,1),1);
+end
 if plotOptions.plotData
     for i=1:size(result.data,1)
         hdata(i) = plot(result.data(i,1),result.data(i,2)./result.data(i,3),'.','MarkerSize',sqrt(plotOptions.dataSize*result.data(i,3)),'Color',plotOptions.dataColor);
