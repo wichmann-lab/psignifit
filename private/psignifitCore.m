@@ -93,13 +93,10 @@ switch options.estimateType
   else
       optimiseOptions = optimset('Display','off');
   end
-  lic = license ('inuse');
-  if strcmp(lic(1).feature,'matlab')
+  if ~exist('OCTAVE_VERSION', 'builtin')
       Fit = fminsearch(fun, x0,optimiseOptions); %MATLAB standard choice 
-  elseif strcmp(lic(1).feature,'octave')
-      Fit = fminunc(fun, x0,optimiseOptions);    % in Octave fminsearch does not work here, god knows why...
   else
-      Fit = x0;                                  % if you are neither using MATLAB nor Octave, should be somewhat rare...
+      Fit = fminunc(fun, x0,optimiseOptions);    % in Octave fminsearch does not work here, god knows why...
   end
   switch options.expType
    case 'YesNo',           result.Fit = Fit;
