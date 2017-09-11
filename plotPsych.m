@@ -83,7 +83,7 @@ if ~holdState
     cla(h);
 end
 hold on
-if verLessThan('matlab', 'R2013a')
+if verLessThan('matlab', '8.1')
     hdata = zeros(size(result.data,1),1);
 else
     hdata = gobjects(size(result.data,1),1);
