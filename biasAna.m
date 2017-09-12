@@ -8,7 +8,7 @@ options.priors = cell(5,1);
 options.borders = nan(5,2);
 options.expType = 'YesNo';
 
-options.priors{4} = @(x) betapdf(x,2,2);
+options.priors{4} = @(x) my_betapdf(x,2,2);
 options.borders(3,:) = [0,.1];
 options.borders(4,:) = [.11,.89];
 options.fixedPars = nan(5,1);

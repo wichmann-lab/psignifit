@@ -35,7 +35,7 @@ switch result.options.sigmoidName
     case {'norm','gauss','neg_norm','neg_gauss'}   % cumulative normal distribution
         C         = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
         normalizedStimLevel = (stimLevel-theta0(1))/theta0(2).*C;
-        slopeNormalized = normpdf(normalizedStimLevel);
+        slopeNormalized = my_normpdf(normalizedStimLevel);
         slope = slopeNormalized *C./theta0(2);
     case {'logistic','neg_logistic'}         % logistic function
         C = 2 * log(1./alpha - 1) ./ theta0(2);
@@ -56,7 +56,7 @@ switch result.options.sigmoidName
     case {'logn','neg_logn'}             % cumulative lognormal distribution
         C      = my_norminv(1-alpha,0,1) - my_norminv(alpha,0,1);
         normalizedStimLevel = (log(stimLevel)-theta0(1))/theta0(2);
-        slopeNormalized = normpdf(normalizedStimLevel);
+        slopeNormalized = my_normpdf(normalizedStimLevel);
         slope = slopeNormalized *C./theta0(2)./stimLevel; 
         
     case {'Weibull','weibull','neg_Weibull','neg_weibull'} % Weibull
