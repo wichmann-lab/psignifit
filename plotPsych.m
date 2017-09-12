@@ -83,10 +83,14 @@ if ~holdState
     cla(h);
 end
 hold on
+if exist ('OCTAVE_VERSION', 'builtin')
+    hdata = zeros(size(result.data,1),1);
+else
 if verLessThan('matlab', '8.1')
     hdata = zeros(size(result.data,1),1);
 else
     hdata = gobjects(size(result.data,1),1);
+end
 end
 if plotOptions.plotData
     for i=1:size(result.data,1)

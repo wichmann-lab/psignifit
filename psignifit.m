@@ -273,7 +273,7 @@ end
 
 result.psiHandle = @(x) result.Fit(4)+ (1-result.Fit(3)-result.Fit(4))*result.options.sigmoidHandle(x,result.Fit(1),result.Fit(2));
 
-[resul.devianceResiduals,result.deviance] = getDeviance(result);
+[result.devianceResiduals,result.deviance] = getDeviance(result);
 
 result.Cov = getCov(result);
 result.Cor = getCor(result);
