@@ -221,18 +221,7 @@ options.borders= [ 1,2  ...   % threshold between 1 and 2
 
 % NOTE: By this you artificially exclude all values out of this range. Only
 % exclude parameter values, which are truely impossible!
-      
-
-%% options.setBordersType = 0
-% The method to set the outer borders of the grid. You find it's use in
-% setBorders.m
-% defaults to reasonable estimates for the threshold and width parameter:
-options.setBordersType = 0;
-
-% To set the borders for arbitrary parameterizations change to 
-options.setBordersType = 1; 
-% But also see demo_XXX on how to implement other parameterizations as all
-% build in functions are parameterized by threshold and width
+ 
 
 %% options.maxBorderValue = exp(-10)
 % Parts of the grid which produce marginal values below this are considered

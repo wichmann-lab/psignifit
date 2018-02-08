@@ -37,7 +37,6 @@ if ~isfield(options,'expType'),              options.expType        = 'YesNo';  
 if ~isfield(options,'estimateType'),         options.estimateType   = 'MAP';          end
 if ~isfield(options,'confP'),                options.confP          = [0.95,0.9,.68]; end
 if ~isfield(options,'instantPlot'),          options.instantPlot    = 0;              end
-if ~isfield(options,'setBordersType'),       options.setBordersType = 0;              end
 if ~isfield(options,'maxBorderValue'),       options.maxBorderValue = .00001;         end
 if ~isfield(options,'moveBorders'),          options.moveBorders    = 1;              end
 if ~isfield(options,'dynamicGrid'),          options.dynamicGrid    = 0;              end
