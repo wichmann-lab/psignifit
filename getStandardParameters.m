@@ -46,35 +46,39 @@ if isstruct(theta)
     theta = theta.Fit;
 end
 
+if numel(theta) == 5
+    theta = theta(:);
+end
+
 assert(logical(exist('type','var')),'You need to specify which kind of sigmoid you fit');
 
 switch type
     case {'norm','gauss','neg_norm','neg_gauss'}
-        theta(1) = theta(1);
+        theta(1,:) = theta(1,:);
         C        = my_norminv(1-widthalpha,0,1) - my_norminv(widthalpha,0,1);
-        theta(2) = theta(2)./C;
+        theta(2,:) = theta(2,:)./C;
     case {'logistic','neg_logistic'}
-        theta(1) = theta(1);
-        theta(2) = 2*log(1./widthalpha-1)./theta(2);
+        theta(1,:) = theta(1,:);
+        theta(2,:) = 2*log(1./widthalpha-1)./theta(2,:);
     case {'Weibull','weibull','neg_Weibull','neg_weibull'}
         C        = log(-log(widthalpha)) - log(-log(1-widthalpha));
-        shape    = C./theta(2);
-        scale    = exp(C./ theta(2) .* (-theta(1)) + log(-log(.5)));
+        shape    = C./theta(2,:);
+        scale    = exp(C./ theta(2,:) .* (-theta(1,:)) + log(-log(.5)));
         scale    = exp(log(1/scale)/shape); %Wikipediascale
-        theta(1) = scale;
-        theta(2) = shape;
+        theta(1,:) = scale;
+        theta(2,:) = shape;
     case {'gumbel','neg_gumbel'}
         % note that gumbel and reversed gumbel definitions are sometimes swapped
         % and sometimes called extreme value distributions
         C        = log(-log(widthalpha)) - log(-log(1-widthalpha));
-        theta(2) = theta(2)/C;
-        theta(1) = theta(1)-theta(2).*log(-log(.5));
+        theta(2,:) = theta(2,:)/C;
+        theta(1,:) = theta(1,:)-theta(2,:).*log(-log(.5));
     case {'rgumbel','neg_rgumbel'}
         C      = log(-log(1-widthalpha)) - log(-log(widthalpha));
-        theta(2) = -theta(2)./C;
-        theta(1) = theta(1)+theta(2).*log(-log(.5));
+        theta(2,:) = -theta(2,:)./C;
+        theta(1,:) = theta(1,:)+theta(2,:).*log(-log(.5));
     case {'tdist','student','heavytail','neg_tdist','neg_student','neg_heavytail'} 
         C      = (my_t1icdf(1-widthalpha) - my_t1icdf(widthalpha));    
-        theta(1) = theta(1);
-        theta(2) = theta(2)./C;
+        theta(1,:) = theta(1,:);
+        theta(2,:) = theta(2,:)./C;
 end
