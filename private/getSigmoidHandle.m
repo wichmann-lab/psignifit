@@ -20,8 +20,10 @@ elseif ischar(options)
     alpha   = .05;
     PC      = .5;
 end
-if strcmp(sigmoid(1:3),'neg')
-    PC = 1-PC;
+if ischar(sigmoid)
+    if strcmp(sigmoid(1:3),'neg')
+        PC = 1-PC;
+    end
 end
 
 if ischar(sigmoid)
@@ -83,8 +85,7 @@ if ischar(sigmoid)
             error('unknown sigmoid function');
     end
 elseif isa(sigmoid,'function_handle')
-  %Handle = @(X,m,width) sigmoid(X,m,width);
-    Handle = sigmoid;  %???
+    Handle = sigmoid;  
 else
     error('sigmoid must be either handle or name of a sigmoid');
 end

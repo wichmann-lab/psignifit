@@ -106,7 +106,7 @@ assert(max(data(:,1)) > min(data(:,1)) , 'Your data does not have variance on th
 % fit our expectations better then.
 % The flag is needed for the setting of the parameter bounds in setBorders
 
-if any(strcmpi(options.sigmoidName,{'Weibull','logn','weibull'}))
+if any(strcmpi(options.sigmoidName,{'Weibull','logn','weibull'})) % This is NOT run if options.sigmoidName is a handle here
     options.logspace = 1;
     assert(min(data(:,1)) > 0, 'The sigmoid you specified is not defined for negative data points!');
 else
@@ -208,8 +208,16 @@ if all(data(:,3)<=5) && numel(options.stimulusRange)==1
 end
 
 % create function handle to the sigmoid
-options.sigmoidHandle = getSigmoidHandle(options);
-
+if ~isfield(options,'sigmoidHandle')
+    options.sigmoidHandle = getSigmoidHandle(options);
+    if isa(options.sigmoidName, 'function_handle')
+        options.sigmoidName = 'Custom Handle Provided';
+    end
+else 
+    if strcmp(options.sigmoidName,'norm') % i.e. sigmoidName not set by user
+        options.sigmoidName = 'Custom Handle Provided';
+    end
+end
 % borders of integration
 if isfield(options, 'borders')
     borders = setBorders(options);
