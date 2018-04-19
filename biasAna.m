@@ -3,19 +3,33 @@ function biasAna(data1,data2,options)
 % runs a short analysis to see whether two 2AFC datasets have a bias and
 % whether it can be explained with a "finger bias"-> a bias in guessing
 
+options.expType = 'YesNo'; % must be set this way to fit gamma & lambda
 
-options.priors = cell(5,1);
-options.borders = nan(5,2);
-options.expType = 'YesNo';
-
-options.priors{4} = @(x) my_betapdf(x,2,2);
-options.borders(3,:) = [0,.1];
-options.borders(4,:) = [.11,.89];
-options.fixedPars = nan(5,1);
-options.fixedPars(5) = 0;
-options.stepN   = [40,40,40,40,1];
-options.mbStepN = [30,30,20,20,1];
-
+if ~isfield(options,'priors')
+    options.priors = cell(5,1);
+end
+if isempty(options.priors{4})
+    options.priors{4} = @(x) my_betapdf(x,2,2);
+end
+if ~isfield(options,'borders')
+    options.borders = nan(5,2);
+end
+if isnan(options.border(3,1))
+    options.borders(3,:) = [0,.1];
+end
+if isnan(options.border(4,1))
+    options.borders(4,:) = [.11,.89];
+end
+if ~isfield(options,'fixedPars')
+    options.fixedPars = nan(5,1);
+    options.fixedPars(5) = 0;
+end
+if ~isfield(options,'stepN')
+    options.stepN   = [40,40,40,40,1];
+end
+if ~isfield(options,'mbStepN')
+    options.mbStepN = [30,30,20,20,1];
+end
 resAll = psignifit([data1;data2],options);
 res1 = psignifit(data1,options);
 res2 = psignifit(data2,options);
