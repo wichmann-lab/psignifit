@@ -19,7 +19,7 @@ for id= 1:length(priors)
         y = priors{id}(x);
         w = conv(diff(x),[.5,.5]);
         integral = sum(y(:).*w(:));
-        priors{id} = @(x) priors{id}(x)./integral;
+        priors{id} = @(x) (x>=options.borders(id,1)).*(x<=options.borders(id,2)).*priors{id}(x)./integral;
     else 
         priors{id} = @(x) 1;
     end

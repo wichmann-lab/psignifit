@@ -63,11 +63,11 @@ if strcmp(options.expType,'2AFC'),
 end
 if strcmp(options.expType,'3AFC'),
     options.expType        = 'nAFC';
-    options.expN           = 3;        
+    options.expN           = 3;
 end
 if strcmp(options.expType,'4AFC'),
     options.expType        = 'nAFC';
-    options.expN           = 4;        
+    options.expN           = 4;
 end
 
 if all(~isnan(options.fixedPars(3:4)))
@@ -158,11 +158,11 @@ end
 
 if ~isfield(options,'priors')
     options.priors         = getStandardPriors(options);
-else 
+else
     if iscell(options.priors)
         priors = getStandardPriors(options);
         % if provided priors are to short
-        if length(options.priors)<5 
+        if length(options.priors)<5
             options.priors = [options.priors,cell(1,5-length(options.priors))];
         end
         for ipar = 1:5
@@ -175,7 +175,7 @@ else
     else
         error('if you provide your own priors it should be a cell array of function handles')
     end
-    %check priors 
+    %check priors
     checkPriors(data,options);
 end
 
@@ -213,13 +213,18 @@ if ~isfield(options,'sigmoidHandle')
     if isa(options.sigmoidName, 'function_handle')
         options.sigmoidName = 'Custom Handle Provided';
     end
-else 
+else
     if strcmp(options.sigmoidName,'norm') % i.e. sigmoidName not set by user
         options.sigmoidName = 'Custom Handle Provided';
     end
 end
 % borders of integration
 if isfield(options, 'borders')
+    if any(options.borders(:,1)==options.borders(:,2))
+        error('You specified equal upper and lower borders, please use options.fixedPars instead! This is caught here as only chaning the borders will mess with the MAP optimization.')
+    elseif any(options.borders(:,1)<options.borders(:,2))
+        error('The borders for one or more parameters are in the wrong order!')
+    end
     borders = setBorders(options);
     options.borders(isnan(options.borders)) = borders(isnan(options.borders));
     options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
@@ -253,28 +258,32 @@ result = psignifitCore(data, options);
 
 %check that the marginals go to nearly 0 at the borders of the grid
 if options.verbose > -5
-    if result.marginals{1}(1).* result.marginalsW{1}(1) > .001
-        warning('psignifit:borderWarning',...
-           ['The marginal for the threshold is not near 0 at the lower border\n',...
-            'This indicates that smaller Thresholds would be possible'])
+    if isnan(options.fixedPars(1))
+        if result.marginals{1}(1).* result.marginalsW{1}(1) > .001
+            warning('psignifit:borderWarning',...
+                ['The marginal for the threshold is not near 0 at the lower border\n',...
+                'This indicates that smaller Thresholds would be possible'])
+        end
+        if result.marginals{1}(end).* result.marginalsW{1}(end) > .001
+            warning('psignifit:borderWarning',...
+                ['The marginal for the threshold is not near 0 at the upper border\n',...
+                'This indicates that your data is not sufficient to exclude much higher thresholds.\n',...
+                'Refer to the paper or the manual for more info on this topic'])
+        end
     end
-    if result.marginals{1}(end).* result.marginalsW{1}(end) > .001
-        warning('psignifit:borderWarning',...
-           ['The marginal for the threshold is not near 0 at the upper border\n',...
-            'This indicates that your data is not sufficient to exclude much higher thresholds.\n',...
-            'Refer to the paper or the manual for more info on this topic'])
-    end
-    if result.marginals{2}(1).* result.marginalsW{2}(1) > .001
-        warning('psignifit:borderWarning',...
-           ['The marginal for the width is not near 0 at the lower border\n',...
-            'This indicates that your data is not sufficient to exclude much lower widths.\n',...
-            'Refer to the paper or the manual for more info on this topic'])
-    end
-    if result.marginals{2}(end).* result.marginalsW{2}(end) > .001
-        warning('psignifit:borderWarning',...
-           ['The marginal for the width is not near 0 at the lower border\n',...
-            'This indicates that your data is not sufficient to exclude much higher widths.\n',...
-            'Refer to the paper or the manual for more info on this topic'])
+    if isnan(options.fixedPars(2))
+        if result.marginals{2}(1).* result.marginalsW{2}(1) > .001
+            warning('psignifit:borderWarning',...
+                ['The marginal for the width is not near 0 at the lower border\n',...
+                'This indicates that your data is not sufficient to exclude much lower widths.\n',...
+                'Refer to the paper or the manual for more info on this topic'])
+        end
+        if result.marginals{2}(end).* result.marginalsW{2}(end) > .001
+            warning('psignifit:borderWarning',...
+                ['The marginal for the width is not near 0 at the lower border\n',...
+                'This indicates that your data is not sufficient to exclude much higher widths.\n',...
+                'Refer to the paper or the manual for more info on this topic'])
+        end
     end
 end
 
