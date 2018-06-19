@@ -222,7 +222,7 @@ end
 if isfield(options, 'borders')
     if any(options.borders(:,1)==options.borders(:,2))
         error('You specified equal upper and lower borders, please use options.fixedPars instead! This is caught here as only chaning the borders will mess with the MAP optimization.')
-    elseif any(options.borders(:,1)<options.borders(:,2))
+    elseif any(options.borders(:,2)<options.borders(:,1))
         error('The borders for one or more parameters are in the wrong order!')
     end
     borders = setBorders(options);
