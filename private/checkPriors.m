@@ -38,7 +38,7 @@ end
 
 %% on lambda 
 % values 0 to .9
-testValues = linspace(0.001,.9,25);
+testValues = linspace(0,.9,25);
 
 testresult = options.priors{3}(testValues);
 
@@ -50,7 +50,7 @@ end
 
 %% on gamma
 % values 0 to .9
-testValues = linspace(0.0001,.9,25);
+testValues = linspace(0,.9,25);
 
 testresult = options.priors{4}(testValues);
 
