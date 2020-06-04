@@ -6,7 +6,7 @@ function plotBayes(result,plotOptions)
 % You may then enlarge each panel by clicking on it.
 
 if ~exist('plotOptions','var')       , plotOptions          = struct;      end
-if ~isfield('plotOptions','colorMap'), plotOptions.colorMap = getColormap; end
+if ~isfield(plotOptions,'colorMap'), plotOptions.colorMap = getColormap; end
 
 mainPlot(result,plotOptions);
 end
