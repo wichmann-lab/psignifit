@@ -16,9 +16,9 @@ loglikelihoodMeasured = result.data(:,2).*log(pMeasured)+(result.data(:,3)-resul
 loglikelihoodMeasured(pMeasured==1) = 0;
 loglikelihoodMeasured(pMeasured==0) = 0;
 
-devianceResiduals = -2*sign(pMeasured-pPred).*(loglikelihoodMeasured - loglikelihoodPred);
+devianceResiduals = sign(pMeasured-pPred).*sqrt(2*(loglikelihoodMeasured - loglikelihoodPred));
 
-deviance = sum(abs(devianceResiduals));
+deviance = sum(devianceResiduals.^2);
 
 if nargout > 2
     if ~exist('Nsamples','var') || isempty(Nsamples)
@@ -33,7 +33,7 @@ if nargout > 2
         loglikelihoodMeasured = samp_dat.*log(pMeasured)+(result.data(iData,3)-samp_dat).*log((1-pMeasured));
         loglikelihoodMeasured(pMeasured==1) = 0;
         loglikelihoodMeasured(pMeasured==0) = 0;
-        samples_devianceResiduals(:,iData) = -2*sign(pMeasured-pPred(iData)).*(loglikelihoodMeasured - loglikelihoodPred);
+        samples_devianceResiduals(:,iData) = sign(pMeasured-pPred(iData)).*sqrt(2.*(loglikelihoodMeasured - loglikelihoodPred));
     end
-    samples_deviance = sum(abs(samples_devianceResiduals),2);
+    samples_deviance = sum(samples_devianceResiduals.^2, 2);
 end
