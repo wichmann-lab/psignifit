@@ -5,7 +5,7 @@ function slope = getSlopePC(result, pCorrect, unscaled)
 %
 % result is a result struct from psignifit.
 %
-% pCorrect is the percent correct where to evaluate the slope.
+% pCorrect is the proportion correct where to evaluate the slope (in [0,1]).
 % 
 % By default this function uses the percent correct of the function scaled
 % by the asymptotes, i.e. the final psychometric function. 
