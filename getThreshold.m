@@ -5,7 +5,8 @@ function [threshold,CI] = getThreshold(result, pCorrect, unscaled)
 %
 % result is a result struct from psignifit
 %
-% pCorrect is the percent correct at the threshold you want to calculate
+% pCorrect is the proportion correct at the threshold you want to calculate
+%          (in [0,1])
 %
 % threshold returns the stimulus level at which pCorrect is reached
 % CI will return a nx2 array of n credible intervals for this threshold
