@@ -1,4 +1,4 @@
-function p = logLikelihood(data,options,alpha,beta,lambda,gamma,varscale)
+function [p, p_per_datum] = logLikelihood(data,options,alpha,beta,lambda,gamma,varscale)
 % the core function to evaluate the logLikelihood of the data
 %function p=logLikelihood(data,options,alpha,beta,lambda,gamma,varscale)
 % Calculates the logLikelihood of the given data with given parameter
@@ -77,13 +77,15 @@ if oneParameter
         p     = p - gammaln(a) - gammaln(b);
         p     = p + gammaln(v);
     end
-    p = sum(p);% add up loglikelihood
+    p_per_datum = p;
+    p = sum(p_per_datum);% add up loglikelihood
     % + (be-1).*log(1-varscale)-betaln(1,be); % add up loglikelihood and add prior
     if isnan(p)
         p = -inf;
     end
 else % for grid evaluation! with bsxfuns
     %reshaping
+    assert(nargout <= 1, 'Parallelized logLikelihood with per-datum evaluations not implemented');
     alpha   = reshape(alpha   ,[],1);
     beta    = reshape(beta    ,1,[]);
     lambda  = reshape(lambda  ,1,1,[]);
