@@ -108,7 +108,7 @@ assert(max(data(:,1)) > min(data(:,1)) , 'Your data does not have variance on th
 
 if any(strcmpi(options.sigmoidName,{'Weibull','logn','weibull'})) % This is NOT run if options.sigmoidName is a handle here
     options.logspace = 1;
-    assert(min(data(:,1)) > 0, 'The sigmoid you specified is not defined for negative data points!');
+    assert(min(data(:,1)) >= 0, 'The sigmoid you specified is not defined for negative data points!');
 else
     options.logspace=0;
 end
@@ -117,7 +117,7 @@ end
 % if range was not given take from data
 if numel(options.stimulusRange)<=1
     if options.logspace
-        options.stimulusRange = log([min(data(:,1)),max(data(:,1))]);
+        options.stimulusRange = log([min(data(data(:,1)>0,1)),max(data(:,1))]);
     else
         options.stimulusRange = [min(data(:,1)),max(data(:,1))];
     end

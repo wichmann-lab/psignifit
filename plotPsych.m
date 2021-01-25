@@ -101,10 +101,11 @@ end
 %% plot fitted function
 %for dashed ends:
 if result.options.logspace
-    xlength   = log(max(result.data(:,1)))-log(min(result.data(:,1)));
-    x         = exp(linspace(log(min(result.data(:,1))),log(max(result.data(:,1))),1000));
-    xLow      = exp(linspace(log(min(result.data(:,1)))-plotOptions.extrapolLength*xlength,log(min(result.data(:,1))),100));
-    xHigh     = exp(linspace(log(max(result.data(:,1))),log(max(result.data(:,1)))+plotOptions.extrapolLength*xlength,100));
+    xOK = result.data(result.data(:,1)>0,1);
+    xlength   = log(max(xOK))-log(min(xOK));
+    x         = exp(linspace(log(min(xOK)),log(max(xOK)),1000));
+    xLow      = exp(linspace(log(min(xOK))-plotOptions.extrapolLength*xlength,log(min(xOK)),100));
+    xHigh     = exp(linspace(log(max(xOK)),log(max(xOK))+plotOptions.extrapolLength*xlength,100));
 else
     xlength   = max(result.data(:,1))-min(result.data(:,1));
     x         = linspace(min(result.data(:,1)),max(result.data(:,1)),1000);
