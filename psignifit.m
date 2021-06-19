@@ -220,6 +220,11 @@ else
 end
 % borders of integration
 if isfield(options, 'borders')
+    if any(options.borders(:,1)==options.borders(:,2))
+        error('You specified equal upper and lower borders, please use options.fixedPars instead! This is caught here as only chaning the borders will mess with the MAP optimization.')
+    elseif any(options.borders(:,2)<options.borders(:,1))
+        error('The borders for one or more parameters are in the wrong order!')
+    end
     borders = setBorders(options);
     options.borders(isnan(options.borders)) = borders(isnan(options.borders));
     options.borders(~isnan(options.fixedPars),1) = options.fixedPars(~isnan(options.fixedPars)); %fix parameter values
