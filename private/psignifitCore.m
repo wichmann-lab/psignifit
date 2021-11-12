@@ -91,12 +91,12 @@ switch options.estimateType
       optimiseOptions = optimset('MaxFunEvals',100,'MaxIter',100,'TolX',0,'TolFun',0);
       warning('changed options for optimization')
   else
-      optimiseOptions = optimset('Display','off');
+      optimiseOptions = optimset('Display','off', 'TolFun', 10^-7, 'TolX', 10^-7);
   end
   if ~exist('OCTAVE_VERSION', 'builtin')
-      Fit = fminsearch(fun, x0,optimiseOptions); %MATLAB standard choice 
+      Fit = fminsearch(fun, x0, optimiseOptions); %MATLAB standard choice
   else
-      Fit = fminunc(fun, x0,optimiseOptions);    % in Octave fminsearch does not work here, god knows why...
+      Fit = fminunc(fun, x0, optimiseOptions);    % in Octave fminsearch does not work here, god knows why...
   end
   switch options.expType
    case 'YesNo',           result.Fit = Fit;
