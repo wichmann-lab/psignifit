@@ -1,0 +1,1 @@
+{"expType":"YesNo","betaPrior":10,"threshPC":0.5,"sigmoidName":"norm","theta0":[1,1,0.081205242939416208,0.054781857221396661,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

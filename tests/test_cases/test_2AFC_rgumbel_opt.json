@@ -1,0 +1,1 @@
+{"expType":"2AFC","betaPrior":10,"threshPC":0.5,"sigmoidName":"rgumbel","expN":2,"theta0":[1,1,0.075578899262388172,0.5,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

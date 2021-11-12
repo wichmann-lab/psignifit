@@ -1,0 +1,1 @@
+{"expType":"YesNo","betaPrior":10,"threshPC":0.5,"sigmoidName":"logistic","theta0":[1,1,0.070024744117264878,0.097762621561412549,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

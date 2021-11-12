@@ -1,0 +1,1 @@
+{"expType":"YesNo","betaPrior":10,"threshPC":0.5,"sigmoidName":"gumbel","theta0":[1,1,0.07519466943762311,0.067382647601432172,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

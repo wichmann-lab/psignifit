@@ -1,0 +1,1 @@
+{"expType":"2AFC","betaPrior":10,"threshPC":0.5,"sigmoidName":"logn","expN":2,"theta0":[1,1,0.03653240657102276,0.5,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

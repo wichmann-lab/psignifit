@@ -1,0 +1,1 @@
+{"expType":"equalAsymptote","betaPrior":10,"threshPC":0.5,"sigmoidName":"Weibull","theta0":[1,1,0.0877019253375998,0.0877019253375998,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

@@ -1,0 +1,1 @@
+{"expType":"equalAsymptote","betaPrior":10,"threshPC":0.5,"sigmoidName":"tdist","theta0":[1,1,0.042708702249612922,0.042708702249612922,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}

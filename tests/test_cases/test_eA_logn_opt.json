@@ -1,0 +1,1 @@
+{"expType":"equalAsymptote","betaPrior":10,"threshPC":0.5,"sigmoidName":"logn","theta0":[1,1,0.077547770362664192,0.077547770362664192,0],"fixedPars":[null,null,null,null,null],"poolxTol":0.05,"poolMaxLength":null,"poolMaxGap":null,"estimateType":"MAP"}
