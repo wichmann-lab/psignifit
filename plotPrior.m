@@ -39,7 +39,11 @@ widthmax  = range;
 
 
 % calculate mean for priors
+theta = zeros(5, 1);
 for itheta = 1:5
+    if ~isnan(res.options.fixedPars(itheta))
+        theta(itheta) = res.options.fixedPars(itheta);
+    else
     switch itheta
         case 1
             x = linspace(res.options.stimulusRange(1)-.5*range,res.options.stimulusRange(2)+.5*range,10000);
@@ -54,6 +58,7 @@ for itheta = 1:5
     end
     y = res.options.priors{itheta}(x);
     theta(itheta) = sum(x.*y)./sum(y);
+    end
 end
 if strcmp(res.options.expType,'equalAsymptote')
     theta(4) = theta(3);
